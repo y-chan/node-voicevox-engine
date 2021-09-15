@@ -8,12 +8,12 @@ using namespace Napi;
 Napi::Object CoreWrapper::NewInstance(Napi::Env env, const Napi::CallbackInfo& info)
 {
     Napi::EscapableHandleScope scope(env);
-    if (info.Length() < 3) {
+    if (info.Length() < 2) {
         Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
         return Napi::Object::New(env);
     }
 
-    if (!info[0].IsString() || !info[1].IsString() || !info[2].IsBoolean()) {
+    if (!info[0].IsString() || !info[1].IsBoolean()) {
         Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
         return Napi::Object::New(env);
     }
@@ -45,8 +45,11 @@ CoreWrapper::CoreWrapper(const Napi::CallbackInfo& info)
     : Napi::ObjectWrap<CoreWrapper>(info)
 {
     std::string library_file_path = info[0].As<Napi::String>().Utf8Value();
-    std::string root_dir_path = info[1].As<Napi::String>().Utf8Value();
-    bool use_gpu = info[2].As<Napi::Boolean>().Value();
+    bool use_gpu = info[1].As<Napi::Boolean>().Value();
+    std::string root_dir_path = library_file_path;
+    if (info[2].IsString()) {
+        root_dir_path = info[2].As<Napi::String>().Utf8Value();
+    }
     try {
         m_core = new Core(library_file_path, root_dir_path, use_gpu);
     }
