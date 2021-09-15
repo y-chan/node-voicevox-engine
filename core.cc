@@ -4,7 +4,7 @@ Core::Core(const std::string library_file_path, const std::string root_dir_path,
 {
     HMODULE handler = LoadLibrary(library_file_path.c_str());
     if (handler == nullptr) {
-        throw std::runtime_error("コアライブラリの読み込みに失敗しました。");
+        throw std::runtime_error("failed to load core library");
     }
 	INIT initialize = (INIT)GetProcAddress(handler, "initialize");
 	FARPROC metas = GetProcAddress(handler, "metas");
@@ -18,7 +18,7 @@ Core::Core(const std::string library_file_path, const std::string root_dir_path,
 		yukarin_sa_forward == nullptr ||
 		decode_forward ==nullptr
 	) {
-		throw std::runtime_error("ライブラリの読み込みには成功しましたが、必要な関数が見つかりません。読み込むライブラリを間違えていませんか？");
+		throw std::runtime_error("to load library is succeeded, but can't found needed functions");
 	}
 	m_handler = handler;
     initialize((char*)root_dir_path.c_str(), use_gpu);
