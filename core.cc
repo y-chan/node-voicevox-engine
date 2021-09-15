@@ -1,8 +1,8 @@
 #include "core.h"
 
-Core::Core(const std::string library_file_path, const std::string root_dir_path, bool use_gpu)
+Core::Core(const std::string core_file_path, const std::string root_dir_path, bool use_gpu)
 {
-    HMODULE handler = LoadLibrary(library_file_path.c_str());
+    HMODULE handler = LoadLibrary(core_file_path.c_str());
     if (handler == nullptr) {
         throw std::runtime_error("failed to load core library");
     }

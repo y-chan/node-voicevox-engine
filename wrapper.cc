@@ -44,14 +44,34 @@ Napi::Object CoreWrapper::Init(Napi::Env env, Napi::Object exports)
 CoreWrapper::CoreWrapper(const Napi::CallbackInfo& info)
     : Napi::ObjectWrap<CoreWrapper>(info)
 {
-    std::string library_file_path = info[0].As<Napi::String>().Utf8Value();
+    std::string core_file_path = info[0].As<Napi::String>().Utf8Value();
     bool use_gpu = info[1].As<Napi::Boolean>().Value();
-    std::string root_dir_path = library_file_path;
+    std::string root_dir_path;
     if (info[2].IsString()) {
         root_dir_path = info[2].As<Napi::String>().Utf8Value();
+    } else {
+        std::vector<std::string> split_path;
+        std::string item;
+        for (char ch: core_file_path) {
+            if (ch == '/' || ch == '\\') {
+                if (!item.empty()) split_path.push_back(item);
+                item.clear();
+            } else {
+                item += ch;
+            }
+        }
+        if (!item.empty()) split_path.push_back(item);
+        // remove file name
+        split_path.pop_back();
+        if (core_file_path[0] == '/') {
+            root_dir_path = std::string("/");
+        }
+        std::for_each(split_path.begin(), split_path.end(), [&](std::string path) {
+            root_dir_path += path + std::string("/");
+        });
     }
     try {
-        m_core = new Core(library_file_path, root_dir_path, use_gpu);
+        m_core = new Core(core_file_path, root_dir_path, use_gpu);
     }
     catch (std::exception& err) {
         Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();

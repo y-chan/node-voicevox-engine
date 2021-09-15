@@ -41,7 +41,7 @@ typedef bool (*DECODE)(
 
 class Core {
 public:
-    Core(const std::string library_file_path, std::string root_dir_path, bool use_gpu);
+    Core(const std::string core_file_path, std::string root_dir_path, bool use_gpu);
     ~Core();
 
     const char *metas();
