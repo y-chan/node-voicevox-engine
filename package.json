@@ -2,7 +2,7 @@
   "name": "node-voicevox-core",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "LGPL-2.0",
+  "license": "LGPL-3.0",
   "scripts": {
     "preinstall": "node script/check-mac.js",
     "lint": "eslint .",
