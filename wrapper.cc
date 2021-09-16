@@ -1,5 +1,6 @@
 #include <napi.h>
 #include <string>
+#include <iostream>
 
 #include "wrapper.h"
 
@@ -112,23 +113,27 @@ Napi::Value CoreWrapper::yukarin_s_forward(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
-    int length = info[0].As<Napi::Array>().Length();
+    int length = (int)info[0].As<Napi::Array>().Length();
 
-    long *phoneme_list = (long *)malloc(sizeof(long) * length);
+    std::vector<long> phoneme_list(length);
     for (int i = 0; i < length; i++) {
         Napi::Value val = info[0].As<Napi::Array>()[i];
-        phoneme_list[i] = val.As<Napi::Number>().Int32Value();
+        phoneme_list[i] = (long)val.As<Napi::Number>().Int64Value();
+        std::cout << phoneme_list[i] << std::endl;
     }
 
-    long* speaker_id = (long *)malloc(sizeof(long) * info[1].As<Napi::Array>().Length());
+    std::vector<long> speaker_id(info[1].As<Napi::Array>().Length());
     for (int i = 0; i < (int)info[1].As<Napi::Array>().Length(); i++) {
         Napi::Value val = info[1].As<Napi::Array>()[i];
-        speaker_id[i] = val.As<Napi::Number>().Int32Value();
+        speaker_id[i] = (long)val.As<Napi::Number>().Int64Value();
     }
 
-    float* output = (float *)calloc(length, sizeof(float));
+    float *output = (float *)calloc(length, sizeof(float));
+    //std::vector<float> output(length, 0);
 
-    if (!m_core->yukarin_s_forward(length, phoneme_list, speaker_id, output)) {
+    bool success = m_core->yukarin_s_forward(length, phoneme_list.data(), speaker_id.data(), output);
+
+    if (!success) {
         create_execute_error(env, __func__);
         return env.Null();
     }
@@ -137,10 +142,6 @@ Napi::Value CoreWrapper::yukarin_s_forward(const Napi::CallbackInfo& info)
     for (int i = 0; i < length; i++) {
         output_array[i] = Napi::Number::New(env, output[i]);
     }
-
-    free(phoneme_list);
-    free(speaker_id);
-    free(output);
 
     return output_array;
 }
