@@ -16,7 +16,7 @@ typedef FARPROC void*
 #endif
 
 typedef bool (*INIT)(char *root_dir_path, bool use_gpu);
-typedef const char *(*METAS)();
+typedef const char *(*RETURN_CHAR)();
 typedef bool (*YUKARIN_S)(int length, long *phoneme_list, long *speaker_id, float *output);
 typedef bool (*YUKARIN_SA)(
     int length,
@@ -68,6 +68,8 @@ public:
         long *speaker_id,
         float *output
     );
+
+    const char *last_error_message();
 
 private:
     HMODULE m_handler;

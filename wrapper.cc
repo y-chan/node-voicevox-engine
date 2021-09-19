@@ -87,7 +87,8 @@ CoreWrapper::~CoreWrapper()
 
 void CoreWrapper::create_execute_error(Napi::Env env, const char* func_name)
 {
-    std::string err = std::string("failed to execute: ") + std::string(func_name);
+    std::string last_error = std::string(m_core->last_error_message());
+    std::string err = std::string("failed to execute: ") + std::string(func_name) + std::string("\n") + last_error;
     Napi::Error::New(env, err).ThrowAsJavaScriptException();
 }
 
