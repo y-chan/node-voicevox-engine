@@ -11,8 +11,8 @@
 #define LoadLibrary(path) dlopen(path, RTLD_LAZY)
 #define GetProcAddress(handler, func_name) dlsym(handler, func_name);
 #define FreeLibrary(handler) dlclose(handler);
-typedef HMODULE void*
-typedef FARPROC void*
+typedef void* HMODULE;
+typedef void* FARPROC;
 #endif
 
 typedef bool (*INIT)(char *root_dir_path, bool use_gpu);
