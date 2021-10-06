@@ -5,11 +5,12 @@
       "sources": [
         "wrapper.cc",
         "wrapper.h",
-        "core.cc",
-        "core.h"
+        "core/core.cc",
+        "core/core.h"
       ],
       "include_dirs": [
-        "<!@(node -p \"require('node-addon-api').include\")"
+        "<!@(node -p \"require('node-addon-api').include\")",
+        "lib/openjtalk/src"
       ],
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
