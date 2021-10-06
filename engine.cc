@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 
-#include "wrapper.h"
+#include "engine.h"
 
 using namespace Napi;
 

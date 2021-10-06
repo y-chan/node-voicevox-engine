@@ -3,7 +3,7 @@
 
 #include <napi.h>
 
-#include "core.h"
+#include "core/core.h"
 
 class CoreWrapper : public Napi::ObjectWrap<CoreWrapper> {
 public:

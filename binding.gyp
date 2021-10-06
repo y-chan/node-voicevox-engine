@@ -3,8 +3,8 @@
     {
       "target_name": "core",
       "sources": [
-        "wrapper.cc",
-        "wrapper.h",
+        "engine.cc",
+        "engine.h",
         "core/core.cc",
         "core/core.h"
       ],
