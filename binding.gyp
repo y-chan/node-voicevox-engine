@@ -10,7 +10,19 @@
       ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")",
-        "lib/openjtalk/src"
+        "<(module_root_dir)/lib/open_jtalk/src/jpcommon",
+        "<(module_root_dir)/lib/open_jtalk/src/mecab",
+        "<(module_root_dir)/lib/open_jtalk/src/mecab2njd",
+        "<(module_root_dir)/lib/open_jtalk/src/mecab-naist-jdic",
+        "<(module_root_dir)/lib/open_jtalk/src/njd",
+        "<(module_root_dir)/lib/open_jtalk/src/njd_set_accent_phrase",
+        "<(module_root_dir)/lib/open_jtalk/src/njd_set_accent_type",
+        "<(module_root_dir)/lib/open_jtalk/src/njd_set_digit",
+        "<(module_root_dir)/lib/open_jtalk/src/njd_set_long_vowel",
+        "<(module_root_dir)/lib/open_jtalk/src/njd_set_pronunciation",
+        "<(module_root_dir)/lib/open_jtalk/src/njd_set_unvoiced_vowel",
+        "<(module_root_dir)/lib/open_jtalk/src/njd2jpcommon",
+        "<(module_root_dir)/lib/open_jtalk/src/text2mecab"
       ],
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
