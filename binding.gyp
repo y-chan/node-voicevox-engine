@@ -7,6 +7,8 @@
         "engine.h",
         "core/core.cc",
         "core/core.h",
+        "engine/acoustic_feature_extractor.cc",
+        "engine/acoustic_feature_extractor.h",
         "engine/full_context_label.cc",
         "engine/full_context_label.h",
         "engine/openjtalk.cc",
