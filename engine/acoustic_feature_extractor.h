@@ -27,7 +27,7 @@ private:
 };
 
 
-// TODO: �����Hiroshiba/voiceovox_engine�ł�Jvs�����g���Ă��Ȃ��̂ŁA��U����̂ݎ�������
+// TODO: 現状のHiroshiba/voiceovox_engineではJvsしか使われていないので、一旦これのみ実装した
 class JvsPhoneme {
 public:
 	std::string phoneme;
