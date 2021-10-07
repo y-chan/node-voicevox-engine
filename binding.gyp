@@ -11,7 +11,7 @@
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")",
         "<(module_root_dir)/lib/open_jtalk/src/jpcommon",
-        "<(module_root_dir)/lib/open_jtalk/src/mecab",
+        "<(module_root_dir)/lib/open_jtalk/src/mecab/src",
         "<(module_root_dir)/lib/open_jtalk/src/mecab2njd",
         "<(module_root_dir)/lib/open_jtalk/src/mecab-naist-jdic",
         "<(module_root_dir)/lib/open_jtalk/src/njd",
