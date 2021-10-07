@@ -3,6 +3,8 @@
 ![GitHub](https://img.shields.io/github/license/y-chan/node-voicevox-engine)
 ![npm](https://img.shields.io/npm/v/node-voicevox-engine)
 
+# ※本ライブラリは現在WIP(Work in Progress)です。動作しません。
+
 ## 本ライブラリについて
 本ライブラリは[ヒホ氏](https://github.com/Hiroshiba)によって制作・公開されている、
 [VOICEVOX Engine](https://github.com/Hiroshiba/voicevox_engine)の**非公式**Node.js版、兼
