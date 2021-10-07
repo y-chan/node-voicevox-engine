@@ -7,6 +7,8 @@
         "engine.h",
         "core/core.cc",
         "core/core.h",
+        "engine/full_context_label.cc",
+        "engine/full_context_label.h",
         "engine/openjtalk.cc",
         "engine/openjtalk.h"
       ],
