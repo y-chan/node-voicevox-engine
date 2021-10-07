@@ -6,7 +6,9 @@
         "engine.cc",
         "engine.h",
         "core/core.cc",
-        "core/core.h"
+        "core/core.h",
+        "engine/openjtalk.cc",
+        "engine/openjtalk.h"
       ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")",
