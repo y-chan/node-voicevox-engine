@@ -27,8 +27,8 @@ private:
 };
 
 
-// TODO: 現状のHiroshiba/voiceovox_engineではJvsしか使われていないので、一旦これのみ実装した
-class JvsPhoneme {
+// TODO: 現状のHiroshiba/voiceovox_engineではOjtしか使われていないので、一旦これのみ実装した
+class OjtPhoneme {
 public:
 	std::string phoneme;
 	float start;
@@ -49,14 +49,14 @@ public:
 	static const int num_phoneme() { return phoneme_map().size(); }
 	static const std::string space_phoneme() { return "pau"; }
 
-	JvsPhoneme(std::string phoneme, float start, float end) {
+	OjtPhoneme(std::string phoneme, float start, float end) {
 		this->phoneme = phoneme;
 		this->start = start;
 		this->end = end;
 	}
 
 	int phoneme_id();
-	static std::vector<JvsPhoneme> convert(std::vector<JvsPhoneme> phonemes);
+	static std::vector<OjtPhoneme> convert(std::vector<OjtPhoneme> phonemes);
 };
 
 #endif

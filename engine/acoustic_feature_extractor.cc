@@ -16,16 +16,16 @@ std::vector<float> SamplingData::resample(float sampling_rate, int index, int* l
 	return new_array;
 }
 
-int JvsPhoneme::phoneme_id() {
+int OjtPhoneme::phoneme_id() {
 	return phoneme_map().at(phoneme);
 }
 
-std::vector<JvsPhoneme> JvsPhoneme::convert(std::vector<JvsPhoneme> phonemes) {
+std::vector<OjtPhoneme> OjtPhoneme::convert(std::vector<OjtPhoneme> phonemes) {
 	if (phonemes[0].phoneme.find("sil") != std::string::npos) {
-		phonemes[0].phoneme = JvsPhoneme::space_phoneme();
+		phonemes[0].phoneme = OjtPhoneme::space_phoneme();
 	}
 	if (phonemes.back().phoneme.find("sil") != std::string::npos) {
-		phonemes.back().phoneme = JvsPhoneme::space_phoneme();
+		phonemes.back().phoneme = OjtPhoneme::space_phoneme();
 	}
 	return phonemes;
 }
