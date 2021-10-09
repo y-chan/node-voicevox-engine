@@ -208,6 +208,7 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
 	float pitch_scale = query.Get("pitchScale").As<Napi::Number>().FloatValue();
 	float speed_scale = query.Get("speedScale").As<Napi::Number>().FloatValue();
 	float intonation_scale = query.Get("intonationScale").As<Napi::Number>().FloatValue();
+	float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
 
 	std::vector<float> phoneme_length_list;
 	phoneme_length_list.push_back(pre_phoneme_length);
@@ -285,6 +286,12 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
 		&speaker_id,
 		wave.data()
 	);
+
+	if (volume_scale != 1.0) {
+		for (size_t i = 0; i < wave.size(); i++) {
+			wave[i] *= volume_scale;
+		}
+	}
 
 	return wave;
 }
