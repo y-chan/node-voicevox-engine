@@ -12,7 +12,9 @@
         "engine/full_context_label.cc",
         "engine/full_context_label.h",
         "engine/openjtalk.cc",
-        "engine/openjtalk.h"
+        "engine/openjtalk.h",
+        "engine/synthesis_engine.cc",
+        "engine/synthesis_engine.h"
       ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")",
