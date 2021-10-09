@@ -201,6 +201,106 @@ Napi::Array *SynthesisEngine::replace_mora_pitch(Napi::Array *accent_phrases, lo
     return accent_phrases;
 }
 
+Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, long speaker_id) {
+    std::vector<float> wave = synthesis(query, speaker_id);
+
+    // TODO: resampling
+    float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
+    bool output_stereo = query.Get("outputStereo").As<Napi::Boolean>().Value();
+
+    int num_channels = output_stereo ? 2 : 1;
+
+    Napi::Array converted_wave = Napi::Array::New(env, wave.size() * num_channels);
+    for (size_t i = 0; i < wave.size(); i++) {
+         converted_wave[i*num_channels] = wave[i] * volume_scale;
+         if (output_stereo) converted_wave[i*num_channels+1] = wave[i] * volume_scale;
+    }
+    return converted_wave;
+}
+
+Napi::Buffer<uint8_t> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id) {
+    std::vector<float> wave = synthesis(query, speaker_id);
+
+    // TODO: resampling
+    float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
+    bool output_stereo = query.Get("outputStereo").As<Napi::Boolean>().Value();
+
+    uint8_t num_channels = output_stereo ? 2 : 1;
+    uint8_t bit_depth = 16;
+    int block_size = bit_depth * num_channels / 8;
+
+    if (volume_scale != 1.0) {
+        for (size_t i = 0; i < wave.size(); i++) {
+            wave[i] *= volume_scale;
+        }
+    }
+
+    std::vector<uint8_t> wave_buffer;
+    wave_buffer.push_back(0x52); // R
+    wave_buffer.push_back(0x49); // I
+    wave_buffer.push_back(0x46); // F
+    wave_buffer.push_back(0x46); // F
+    int bytes_size = wave.size() * 8;
+    int wave_size = bytes_size + 44 - 8;
+    for (int i = 0; i < 4; i++) {
+        wave_buffer.push_back((uint8_t)(wave_size & 0xff)); // chunk size
+        wave_size >>= 8;
+    }
+    wave_buffer.push_back(0x57); // W
+    wave_buffer.push_back(0x41); // A
+    wave_buffer.push_back(0x56); // V
+    wave_buffer.push_back(0x45); // E
+    wave_buffer.push_back(0x66); // f
+    wave_buffer.push_back(0x6d); // m
+    wave_buffer.push_back(0x74); // t
+    wave_buffer.push_back(0x20);
+
+    wave_buffer.push_back(16); // fmt header length
+    for (int i = 0; i < 3; i++) wave_buffer.push_back(0); // fmt header length
+    wave_buffer.push_back(1); // linear PCM
+    wave_buffer.push_back(0); // linear PCM
+    wave_buffer.push_back(num_channels); // channnel
+    wave_buffer.push_back(0); // channnel
+
+    int sampling_rate = default_sampling_rate;
+    for (int i = 0; i < 4; i++) {
+        wave_buffer.push_back((uint8_t)(sampling_rate & 0xff));
+        sampling_rate >>= 8;
+    }
+    int block_rate = default_sampling_rate * block_size;
+    for (int i = 0; i < 4; i++) {
+        wave_buffer.push_back((uint8_t)(block_rate & 0xff));
+        block_rate >>= 8;
+    }
+
+    wave_buffer.push_back(block_size);
+    wave_buffer.push_back(0);
+    wave_buffer.push_back(bit_depth);
+    wave_buffer.push_back(0);
+
+    wave_buffer.push_back(0x64); // d
+    wave_buffer.push_back(0x61); // a
+    wave_buffer.push_back(0x74); // t
+    wave_buffer.push_back(0x61); // a
+
+    for (int i = 0; i < 4; i++) {
+        wave_buffer.push_back((uint8_t)(bytes_size & 0xff));
+        block_rate >>= 8;
+    }
+
+    for (float v : wave) {
+        int16_t data = (int16_t)((std::min)(1.0f, std::max(v, -1.0f)) * (float)0x7FFF);
+        wave_buffer.push_back((uint8_t)(data & 0xff));
+        wave_buffer.push_back((uint8_t)((data & 0xff00) >> 8));
+        if (output_stereo) {
+            wave_buffer.push_back((uint8_t)(data & 0xff));
+            wave_buffer.push_back((uint8_t)((data & 0xff00) >> 8));
+        }
+    }
+
+    return Napi::Buffer<uint8_t>::Copy(env, wave_buffer.data(), wave_buffer.size());
+}
+
 std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_id) {
     float rate = 200;
 
@@ -216,7 +316,6 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
     float pitch_scale = query.Get("pitchScale").As<Napi::Number>().FloatValue();
     float speed_scale = query.Get("speedScale").As<Napi::Number>().FloatValue();
     float intonation_scale = query.Get("intonationScale").As<Napi::Number>().FloatValue();
-    float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
 
     std::vector<float> phoneme_length_list;
     phoneme_length_list.push_back(pre_phoneme_length);
@@ -297,12 +396,6 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
 
     if (!success) {
         throw std::runtime_error(m_core->last_error_message());
-    }
-
-    if (volume_scale != 1.0) {
-        for (size_t i = 0; i < wave.size(); i++) {
-            wave[i] *= volume_scale;
-        }
     }
 
     return wave;
