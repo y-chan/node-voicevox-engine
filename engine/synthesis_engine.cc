@@ -289,7 +289,7 @@ Napi::Buffer<uint8_t> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi
     }
 
     for (float v : wave) {
-        int16_t data = (int16_t)((std::min)(1.0f, std::max(v, -1.0f)) * (float)0x7FFF);
+        int16_t data = (int16_t)(std::min(1.0f, std::max(v, -1.0f)) * (float)0x7FFF);
         wave_buffer.push_back((uint8_t)(data & 0xff));
         wave_buffer.push_back((uint8_t)((data & 0xff00) >> 8));
         if (output_stereo) {
