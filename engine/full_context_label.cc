@@ -31,7 +31,7 @@ Phoneme Phoneme::from_label(const std::string label) {
 }
 
 const std::string Phoneme::phoneme() {
-	return contexts.at("p3");
+    return contexts.at("p3");
 }
 
 const bool Phoneme::is_pause() {

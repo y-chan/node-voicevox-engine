@@ -11,33 +11,33 @@
 
 class OpenJTalk {
 public:
-	Mecab* mecab;
-	NJD* njd;
-	JPCommon* jpcommon;
+    Mecab* mecab;
+    NJD* njd;
+    JPCommon* jpcommon;
 
-	OpenJTalk() {
-		mecab = new Mecab();
-		njd = new NJD();
-		jpcommon = new JPCommon();
+    OpenJTalk() {
+        mecab = new Mecab();
+        njd = new NJD();
+        jpcommon = new JPCommon();
 
-		Mecab_initialize(mecab);
-		NJD_initialize(njd);
-		JPCommon_initialize(jpcommon);
-	}
+        Mecab_initialize(mecab);
+        NJD_initialize(njd);
+        JPCommon_initialize(jpcommon);
+    }
 
-	OpenJTalk(std::string dn_mecab) : OpenJTalk() {
-		load(dn_mecab);
-	}
+    OpenJTalk(std::string dn_mecab) : OpenJTalk() {
+        load(dn_mecab);
+    }
 
-	~OpenJTalk() {
-		clear();
-	}
+    ~OpenJTalk() {
+        clear();
+    }
 
-	std::vector<std::string> extract_fullcontext(std::string text);
+    std::vector<std::string> extract_fullcontext(std::string text);
 
 private:
-	void load(std::string dn_mecab);
-	void clear();
+    void load(std::string dn_mecab);
+    void clear();
 };
 
 #endif // OPENJTALK_H
