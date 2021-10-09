@@ -92,4 +92,4 @@ public:
 
 Utterance extract_full_context_label(OpenJTalk openjtalk, std::string text);
 
-#endif // FULL_CONTEXT_LABEL_H'
+#endif // FULL_CONTEXT_LABEL_H
