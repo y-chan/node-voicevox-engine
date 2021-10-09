@@ -1,17 +1,18 @@
 #include "acoustic_feature_extractor.h"
 
-std::vector<float> SamplingData::resample(float sampling_rate, int index, int* length) {
+template <typename T>
+std::vector<T> SamplingData<T>::resample(float sampling_rate, int index, int stride) {
 	if (length == nullptr) {
 		int len = (int)(base_array.size() / rate * sampling_rate);
 		length = &len;
 	}
 
-	std::vector<float> new_array;
+	std::vector<T> new_array;
 	float calc_rate = rate / sampling_rate;
 	float rand_value = rand();
-	for (int i = 0; i < *length; i++) {
+	for (int i = 0; i < base_array.size(); i++) {
 		int j = (int)((rand_value + (float)(index + i)) * calc_rate);
-		new_array.push_back(base_array[j]);
+		for (int k = 0; k < stride; k++) new_array[i * stride + k] = wave[j * stride + k];
 	}
 	return new_array;
 }

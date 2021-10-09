@@ -5,17 +5,18 @@
 #include <random>
 #include <vector>
 
+template <typename T>
 class SamplingData {
 public:
-	std::vector<long> base_array;
+	std::vector<T> base_array;
 	float rate;
 
-	SamplingData(std::vector<long> base_array, float rate) {
+	SamplingData<T>(std::vector<T> base_array, float rate) {
 		this->base_array = base_array;
 		this->rate = rate;
 	}
 
-	std::vector<float> resample(float sampling_rate, int index = 0, int* length = nullptr);
+	std::vector<T> resample(float sampling_rate, int index = 0, int stride = 1);
 
 private:
 	float rand() {
