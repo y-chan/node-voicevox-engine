@@ -6,7 +6,7 @@
 
 using namespace Napi;
 
-Napi::Object CoreWrapper::NewInstance(Napi::Env env, const Napi::CallbackInfo& info)
+Napi::Object EngineWrapper::NewInstance(Napi::Env env, const Napi::CallbackInfo& info)
 {
     Napi::EscapableHandleScope scope(env);
     if (info.Length() < 2) {
@@ -24,14 +24,14 @@ Napi::Object CoreWrapper::NewInstance(Napi::Env env, const Napi::CallbackInfo& i
     return scope.Escape(napi_value(obj)).ToObject();
 }
 
-Napi::Object CoreWrapper::Init(Napi::Env env, Napi::Object exports)
+Napi::Object EngineWrapper::Init(Napi::Env env, Napi::Object exports)
 {
     Napi::Function func = DefineClass(
         env, "CoreWrapper", {
-            InstanceMethod("metas", &CoreWrapper::metas),
-            InstanceMethod("yukarin_s_forward", &CoreWrapper::yukarin_s_forward),
-            InstanceMethod("yukarin_sa_forward", &CoreWrapper::yukarin_sa_forward),
-            InstanceMethod("decode_forward", &CoreWrapper::decode_forward),
+            InstanceMethod("metas", &EngineWrapper::metas),
+            InstanceMethod("yukarin_s_forward", &EngineWrapper::yukarin_s_forward),
+            InstanceMethod("yukarin_sa_forward", &EngineWrapper::yukarin_sa_forward),
+            InstanceMethod("decode_forward", &EngineWrapper::decode_forward),
         });
 
     Napi::FunctionReference* constructor = new Napi::FunctionReference();
@@ -42,8 +42,8 @@ Napi::Object CoreWrapper::Init(Napi::Env env, Napi::Object exports)
     return exports;
 }
 
-CoreWrapper::CoreWrapper(const Napi::CallbackInfo& info)
-    : Napi::ObjectWrap<CoreWrapper>(info)
+EngineWrapper::EngineWrapper(const Napi::CallbackInfo& info)
+    : Napi::ObjectWrap<EngineWrapper>(info)
 {
     std::string core_file_path = info[0].As<Napi::String>().Utf8Value();
     bool use_gpu = info[1].As<Napi::Boolean>().Value();
@@ -79,27 +79,27 @@ CoreWrapper::CoreWrapper(const Napi::CallbackInfo& info)
     }
 }
 
-CoreWrapper::~CoreWrapper()
+EngineWrapper::~EngineWrapper()
 {
     delete m_core;
     m_core = nullptr;
 }
 
-void CoreWrapper::create_execute_error(Napi::Env env, const char* func_name)
+void EngineWrapper::create_execute_error(Napi::Env env, const char* func_name)
 {
     std::string last_error = std::string(m_core->last_error_message());
     std::string err = std::string("failed to execute: ") + std::string(func_name) + std::string("\n") + last_error;
     Napi::Error::New(env, err).ThrowAsJavaScriptException();
 }
 
-Napi::Value CoreWrapper::metas(const Napi::CallbackInfo& info)
+Napi::Value EngineWrapper::metas(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
     Napi::String metas_string = Napi::String::New(env, m_core->metas());
     return metas_string;
 }
 
-Napi::Value CoreWrapper::yukarin_s_forward(const Napi::CallbackInfo& info)
+Napi::Value EngineWrapper::yukarin_s_forward(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
     if (info.Length() < 2) {
@@ -147,7 +147,7 @@ Napi::Value CoreWrapper::yukarin_s_forward(const Napi::CallbackInfo& info)
     return output_array;
 }
 
-Napi::Value CoreWrapper::yukarin_sa_forward(const Napi::CallbackInfo& info)
+Napi::Value EngineWrapper::yukarin_sa_forward(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
     if (info.Length() < 7) {
@@ -293,7 +293,7 @@ Napi::Value CoreWrapper::yukarin_sa_forward(const Napi::CallbackInfo& info)
     return output_array;
 }
 
-Napi::Value CoreWrapper::decode_forward(const Napi::CallbackInfo& info)
+Napi::Value EngineWrapper::decode_forward(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
     if (info.Length() < 3) {
@@ -367,12 +367,12 @@ Napi::Value CoreWrapper::decode_forward(const Napi::CallbackInfo& info)
 }
 
 Napi::Object CreateObject(const Napi::CallbackInfo& info) {
-    return CoreWrapper::NewInstance(info.Env(), info);
+    return EngineWrapper::NewInstance(info.Env(), info);
 }
 
 Napi::Object Initialize(Napi::Env env, Napi::Object exports) {
     Napi::Object new_exports = Napi::Function::New(env, CreateObject);
-    return CoreWrapper::Init(env, new_exports);
+    return EngineWrapper::Init(env, new_exports);
 }
 
 NODE_API_MODULE(core, Initialize)

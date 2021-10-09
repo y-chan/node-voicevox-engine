@@ -5,13 +5,13 @@
 
 #include "core/core.h"
 
-class CoreWrapper : public Napi::ObjectWrap<CoreWrapper> {
+class EngineWrapper : public Napi::ObjectWrap<EngineWrapper> {
 public:
     static Napi::Object Init(Napi::Env env, Napi::Object exports);
     static Napi::Object NewInstance(Napi::Env env, const Napi::CallbackInfo& info);
 
-    CoreWrapper(const Napi::CallbackInfo& info);
-    ~CoreWrapper();
+    EngineWrapper(const Napi::CallbackInfo& info);
+    ~EngineWrapper();
 
     Napi::Value metas(const Napi::CallbackInfo& info);
 
