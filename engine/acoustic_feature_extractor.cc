@@ -16,8 +16,8 @@ std::vector<float> SamplingData::resample(float sampling_rate, int index, int* l
 	return new_array;
 }
 
-int OjtPhoneme::phoneme_id() {
-	return phoneme_map().at(phoneme);
+long OjtPhoneme::phoneme_id() {
+	return (long)phoneme_map().at(phoneme);
 }
 
 std::vector<OjtPhoneme> OjtPhoneme::convert(std::vector<OjtPhoneme> phonemes) {
