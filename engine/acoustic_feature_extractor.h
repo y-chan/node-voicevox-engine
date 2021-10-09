@@ -60,4 +60,4 @@ public:
     static std::vector<OjtPhoneme> convert(std::vector<OjtPhoneme> phonemes);
 };
 
-#endif
+#endif // ACOUSTIC_FEATURE_EXTRACTOR_H
