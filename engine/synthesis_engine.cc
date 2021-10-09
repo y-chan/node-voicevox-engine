@@ -77,7 +77,11 @@ Napi::Array *SynthesisEngine::replace_phoneme_length(Napi::Array *accent_phrases
     std::vector<long> phoneme_list_s;
     for (OjtPhoneme phoneme_data : phoneme_data_list) phoneme_list_s.push_back(phoneme_data.phoneme_id());
     std::vector<float> phoneme_length;
-    m_core->yukarin_s_forward(phoneme_list_s.size(), phoneme_list_s.data(), &speaker_id, phoneme_length.data());
+    bool success = m_core->yukarin_s_forward(phoneme_list_s.size(), phoneme_list_s.data(), &speaker_id, phoneme_length.data());
+
+    if (!success) {
+        throw std::runtime_error(m_core->last_error_message());
+    }
 
     for (size_t i = 0; i < flatten_moras.size(); i++) {
         Napi::Object *mora = flatten_moras[i];
@@ -164,7 +168,7 @@ Napi::Array *SynthesisEngine::replace_mora_pitch(Napi::Array *accent_phrases, lo
 
     int length = vowel_phoneme_list.size();
     std::vector<float> f0_list(length, 0);
-    m_core->yukarin_sa_forward(
+    bool success = m_core->yukarin_sa_forward(
         length,
         vowel_phoneme_list.data(),
         consonant_phoneme_list.data(),
@@ -175,6 +179,10 @@ Napi::Array *SynthesisEngine::replace_mora_pitch(Napi::Array *accent_phrases, lo
         &speaker_id,
         f0_list.data()
     );
+
+    if (!success) {
+        throw std::runtime_error(m_core->last_error_message());
+    }
 
     for (size_t i = 0; i < vowel_phoneme_data_list.size(); i++) {
         std::vector<std::string>::iterator found_unvoice_mora = std::find(
@@ -278,7 +286,7 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
     phoneme = SamplingData<std::vector<float>>(phoneme, rate).resample(24000 / 256, 0, 2);
 
     std::vector<float> wave(phoneme.size(), 0.0);
-    m_core->decode_forward(
+    bool success = m_core->decode_forward(
         phoneme.size(),
         phoneme[0].size(),
         f0.data(),
@@ -286,6 +294,10 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
         &speaker_id,
         wave.data()
     );
+
+    if (!success) {
+        throw std::runtime_error(m_core->last_error_message());
+    }
 
     if (volume_scale != 1.0) {
         for (size_t i = 0; i < wave.size(); i++) {
