@@ -270,7 +270,7 @@ const std::vector<Phoneme> Utterance::phonemes() {
 
     // int total_accent_phrase = 0;
     // for (BreathGroup breath_group : breath_groups) total_accent_phrase += breath_group.accent_phrases.size();
-    // this->set_context("k2", std::to_string(breath_group.accent_phrases
+    // this->set_context("k2", std::to_string(total_accent_phrase));
     this->set_context("k2", std::to_string(accent_phrases.size()));
 
     std::vector<Phoneme> phonemes;
