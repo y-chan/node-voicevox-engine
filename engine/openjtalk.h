@@ -35,7 +35,6 @@ public:
 
     std::vector<std::string> extract_fullcontext(std::string text);
 
-private:
     void load(std::string dn_mecab);
     void clear();
 };
