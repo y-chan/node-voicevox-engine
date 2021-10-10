@@ -17,7 +17,7 @@ public:
 
     Napi::Value yukarin_s_forward(const Napi::CallbackInfo& info);
     Napi::Value yukarin_sa_forward(const Napi::CallbackInfo& info);
-    Napi::Value decode_forward(const Napi::CallbackInfo& info);
+    // Napi::Value decode_forward(const Napi::CallbackInfo& info);
 
 private:
     void create_execute_error(Napi::Env env, const char* func_name);
