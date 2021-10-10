@@ -8,3 +8,5 @@ index.js
 index.d.ts
 
 *.tgz
+
+yarn-error.log
