@@ -3,30 +3,25 @@
 
 #include <map>
 #include <random>
+#include <string>
 #include <vector>
 
 template <typename T>
-class SamplingData {
-public:
-    std::vector<T> base_array;
-    float rate;
+inline std::vector<T> resample(std::vector<T> base_array, float rate, float sampling_rate, int index = 0, int stride = 1) {
+    int length = (int)(base_array.size() / rate * sampling_rate);
 
-    SamplingData<T>(std::vector<T> base_array, float rate) {
-        this->base_array = base_array;
-        this->rate = rate;
+    std::vector<T> new_array;
+    float calc_rate = rate / sampling_rate;
+    std::random_device seed_gen;
+    std::mt19937 engine(seed_gen());
+    std::uniform_real_distribution<float> dist(0.0, 1.0);
+    float rand_value = dist(engine);
+    for (int i = 0; i < base_array.size(); i++) {
+        int j = (int)((rand_value + (float)(index + i)) * calc_rate);
+        for (int k = 0; k < stride; k++) new_array[i * stride + k] = base_array[j * stride + k];
     }
-
-    std::vector<T> resample(float sampling_rate, int index = 0, int stride = 1);
-
-private:
-    float rand() {
-        std::random_device seed_gen;
-        std::mt19937 engine(seed_gen());
-        std::uniform_real_distribution<float> dist(0.0, 1.0);
-        return dist(engine);
-    }
-};
-
+    return new_array;
+}
 
 // TODO: 現状のHiroshiba/voiceovox_engineではOjtしか使われていないので、一旦これのみ実装した
 class OjtPhoneme {
@@ -36,7 +31,7 @@ public:
     float end;
 
     static const std::map<std::string, int> phoneme_map() {
-        return {
+        std::map<std::string, int> phoneme_map = {
             {"pau", 0}, {"A", 1},   {"E", 2},   {"I", 3},   {"N", 4},   {"O", 5},
             {"U", 6},   {"a", 7},   {"b", 8},   {"by", 9},  {"ch", 10}, {"cl", 11},
             {"d", 12},  {"dy", 13}, {"e", 14},  {"f", 15},  {"g", 16},  {"gw", 17},
@@ -46,14 +41,15 @@ public:
             {"sh", 36}, {"t", 37},  {"ts", 38}, {"ty", 39}, {"u", 40},  {"v", 41},
             {"w", 42},  {"y", 43},  {"z", 44}
         };
+        return phoneme_map;
     }
     static const int num_phoneme() { return phoneme_map().size(); }
-    static const std::string space_phoneme() { return "pau"; }
+    static const std::string space_phoneme() { return std::string("pau"); }
 
-    OjtPhoneme(std::string phoneme, float start, float end) {
-        this->phoneme = phoneme;
-        this->start = start;
-        this->end = end;
+    OjtPhoneme(std::string c_phoneme, float c_start, float c_end) {
+        phoneme = c_phoneme;
+        start = c_start;
+        end = c_end;
     }
 
     long phoneme_id();

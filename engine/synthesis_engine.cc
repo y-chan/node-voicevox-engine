@@ -388,8 +388,8 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
         }
     }
 
-    f0 = SamplingData<float>(f0, rate).resample(24000 / 256);
-    phoneme = SamplingData<std::vector<float>>(phoneme, rate).resample(24000 / 256, 0, 2);
+    f0 = resample<float>(f0, rate, 24000 / 256);
+    phoneme = resample<std::vector<float>>(phoneme, rate, 24000 / 256, 0, 2);
 
     std::vector<float> wave(phoneme.size(), 0.0);
     bool success = m_core->decode_forward(
