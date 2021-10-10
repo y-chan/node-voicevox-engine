@@ -148,6 +148,8 @@ BreathGroup BreathGroup::from_phonemes(std::vector<Phoneme> phonemes) {
             accent_phrases.push_back(AccentPhrase::from_phonemes(accent_phonemes));
         }
     }
+
+    return BreathGroup(accent_phrases);
 };
 
 void BreathGroup::set_context(std::string key, std::string value) {
