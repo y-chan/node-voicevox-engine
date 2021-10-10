@@ -4,6 +4,8 @@
 #include <napi.h>
 
 #include "core/core.h"
+#include "engine/openjtalk.h"
+#include "engine/synthesis_engine.h"
 
 class EngineWrapper : public Napi::ObjectWrap<EngineWrapper> {
 public:
@@ -13,6 +15,7 @@ public:
     EngineWrapper(const Napi::CallbackInfo& info);
     ~EngineWrapper();
 
+    Napi::Value EngineWrapper::audio_query(const Napi::CallbackInfo& info);
     Napi::Value metas(const Napi::CallbackInfo& info);
 
     Napi::Value yukarin_s_forward(const Napi::CallbackInfo& info);
@@ -21,8 +24,11 @@ public:
 
 private:
     void create_execute_error(Napi::Env env, const char* func_name);
+    Napi::Array create_accent_phrases(Napi::Env env, Napi::String text, Napi::Number speaker_id);
 
     Core* m_core;
+    OpenJTalk* m_openjtalk;
+    SynthesisEngine* m_engine;
 };
 
 #endif // WRAPPER_H
