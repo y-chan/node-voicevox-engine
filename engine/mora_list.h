@@ -42,6 +42,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef MORA_LIST_H
+#define MORA_LIST_H
+
 #include <string>
 #include <vector>
 
@@ -208,3 +211,5 @@ std::string mora2text(std::string mora) {
     }
     return text;
 }
+
+#endif // MORA_LIST_H
