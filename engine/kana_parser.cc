@@ -35,7 +35,7 @@ static const std::map<std::string, Napi::Object> text2mora_with_unvoice() {
                 unvoice_mora.Set("consonant_length", 0.0f);
             }
             std::string upper_vowel = vowel;
-            std::transform(upper_vowel.begin(), upper_vowel.end(), upper_vowel.begin(), std::toupper);
+            std::transform(upper_vowel.begin(), upper_vowel.end(), upper_vowel.begin(), ::toupper);
             unvoice_mora.Set("vowel", upper_vowel);
             unvoice_mora.Set("vowel_length", 0.0f);
             unvoice_mora.Set("pitch", 0.0f);

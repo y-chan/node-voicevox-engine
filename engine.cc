@@ -130,7 +130,7 @@ Napi::Array EngineWrapper::create_accent_phrases(Napi::Env env, Napi::String tex
 
                 std::string moras_text = "";
                 for (Phoneme phoneme : mora.phonemes()) moras_text += phoneme.phoneme();
-                std::transform(moras_text.begin(), moras_text.end(), moras_text.begin(), std::tolower);
+                std::transform(moras_text.begin(), moras_text.end(), moras_text.begin(), ::tolower);
                 new_mora.Set("text", mora2text(moras_text));
 
                 if (mora.consonant != nullptr) {
