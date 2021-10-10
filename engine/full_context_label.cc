@@ -257,12 +257,26 @@ const std::vector<Phoneme> Utterance::phonemes() {
 
         current.set_context("i1", std::to_string(accent_phrase_num));
 
-        std::vector<AccentPhrase>::iterator found_accent_phrase = std::find(
-            accent_phrases.begin(),
-            accent_phrases.end(),
-            current.accent_phrases[0]
-        );
-        int accent_phrase_index = std::distance(accent_phrases.begin(), found_accent_phrase);
+        std::string current_accent_phrases_labels = "";
+        for (std::string label : current.accent_phrases[0].labels()) {
+            current_accent_phrases_labels += label;
+        }
+
+        int accent_phrase_index = 0;
+        for (size_t i = 0; i <= accent_phrases.size(); i++) {
+            if (i == accent_phrases.size()) {
+                i = accent_phrases.size();
+                break;
+            }
+            AccentPhrase accent_phrase = accent_phrases[i];
+            std::vector<std::string> labels = accent_phrase.labels();
+            std::string total_labels = "";
+            for (std::string label : labels) {
+                total_labels += label;
+            }
+            if (current_accent_phrases_labels == total_labels) accent_phrase_index = i;
+        }
+
         if (accent_phrase_index == accent_phrases.size()) {
             throw std::runtime_error("cannot find accent phrase...");
         }
