@@ -3,21 +3,21 @@ const addon = require('bindings')('core')
 
 interface ICore {
   metas(): string
-  yukarin_s_forward(phoneme_list: number[], speaker_id: number[]): number[]
+  yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[]
   yukarin_sa_forward(
-    vowel_phoneme_list: number[][],
-    consonant_phoneme_list: number[][],
-    start_accent_list: number[][],
-    end_accent_list: number[][],
-    start_accent_phrase_list: number[][],
-    end_accent_phrase_list: number[][],
-    speaker_id: number[]
-  ): number[][]
-  decode_forward(
+    vowel_phoneme_list: number[],
+    consonant_phoneme_list: number[],
+    start_accent_list: number[],
+    end_accent_list: number[],
+    start_accent_phrase_list: number[],
+    end_accent_phrase_list: number[],
+    speaker_id: number
+  ): number[]
+  /* decode_forward(
     f0: number[][],
     phoneme: number[][],
     speaker_id: number[]
-  ): number[]
+  ): number[] */
 }
 
 /**
@@ -59,30 +59,30 @@ class Core implements ICore {
    * @param {number[]} speaker_id - 話者番号
    * @return {number[]} - 音素ごとの長さ
    */
-  yukarin_s_forward(phoneme_list: number[], speaker_id: number[]): number[] {
+  yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[] {
     return this.addon.yukarin_s_forward(phoneme_list, speaker_id)
   }
 
   /**
    * モーラごとの音素列とアクセント情報から、モーラごとの音高を求める
-   * @param {number[][]} vowel_phoneme_list - 母音の音素列
-   * @param {number[][]} consonant_phoneme_list - 子音の音素列
-   * @param {number[][]} start_accent_list - アクセントの開始位置
-   * @param {number[][]} end_accent_list - アクセントの終了位置
-   * @param {number[][]} start_accent_phrase_list - アクセント句の開始位置
-   * @param {number[][]} end_accent_phrase_list - アクセント句の終了位置
-   * @param {number[]} speaker_id - 話者番号
+   * @param {number[]} vowel_phoneme_list - 母音の音素列
+   * @param {number[]} consonant_phoneme_list - 子音の音素列
+   * @param {number[]} start_accent_list - アクセントの開始位置
+   * @param {number[]} end_accent_list - アクセントの終了位置
+   * @param {number[]} start_accent_phrase_list - アクセント句の開始位置
+   * @param {number[]} end_accent_phrase_list - アクセント句の終了位置
+   * @param {number} speaker_id - 話者番号
    * @return {number[][]} - モーラごとの音高
    */
   yukarin_sa_forward(
-    vowel_phoneme_list: number[][],
-    consonant_phoneme_list: number[][],
-    start_accent_list: number[][],
-    end_accent_list: number[][],
-    start_accent_phrase_list: number[][],
-    end_accent_phrase_list: number[][],
-    speaker_id: number[]
-  ): number[][] {
+    vowel_phoneme_list: number[],
+    consonant_phoneme_list: number[],
+    start_accent_list: number[],
+    end_accent_list: number[],
+    start_accent_phrase_list: number[],
+    end_accent_phrase_list: number[],
+    speaker_id: number
+  ): number[] {
     return this.addon.yukarin_sa_forward(
       vowel_phoneme_list,
       consonant_phoneme_list,
@@ -101,13 +101,13 @@ class Core implements ICore {
    * @param {number[]} speaker_id - 話者番号
    * @return {number[]} - 音声波形
    */
-  decode_forward(
+  /* decode_forward(
     f0: number[][],
     phoneme: number[][],
     speaker_id: number[]
   ): number[] {
     return this.addon.decode_forward(f0, phoneme, speaker_id)
-  }
+  } */
 }
 
 export default Core
