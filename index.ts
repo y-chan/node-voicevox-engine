@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-const addon = require('bindings')('core')
+const addon = require('bindings')('engine')
 
-interface ICore {
+interface IEngine {
   metas(): string
   yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[]
   yukarin_sa_forward(
@@ -23,8 +23,8 @@ interface ICore {
 /**
  * Coreの関数をまとめてラップしたクラス
  */
-class Core implements ICore {
-  private readonly addon: ICore
+class Engine implements IEngine {
+  private readonly addon: IEngine
 
   /**
    * Coreクラスの初期化
@@ -110,4 +110,4 @@ class Core implements ICore {
   } */
 }
 
-export default Core
+export default Engine
