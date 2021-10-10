@@ -90,6 +90,6 @@ public:
     const std::vector<std::string> labels();
 };
 
-Utterance extract_full_context_label(OpenJTalk openjtalk, std::string text);
+Utterance extract_full_context_label(OpenJTalk *openjtalk, std::string text);
 
 #endif // FULL_CONTEXT_LABEL_H

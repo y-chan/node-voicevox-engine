@@ -296,8 +296,8 @@ const std::vector<std::string> Utterance::labels() {
     return labels;
 }
 
-Utterance extract_full_context_label(OpenJTalk openjtalk, std::string text) {
-    std::vector<std::string> labels = openjtalk.extract_fullcontext(text);
+Utterance extract_full_context_label(OpenJTalk *openjtalk, std::string text) {
+    std::vector<std::string> labels = openjtalk->extract_fullcontext(text);
     std::vector<Phoneme> phonemes;
     for (std::string label : labels) phonemes.push_back(Phoneme::from_label(label));
     return Utterance::from_phonemes(phonemes);
