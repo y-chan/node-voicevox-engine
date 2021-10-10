@@ -43,6 +43,11 @@
         [
           "OS=='win'",
           {
+            "msbuild_settings": {
+              'ClCompile': {
+                'AdditionalOptions': ["/utf-8"]
+              },
+            },
             "msvs_settings": {
               "VCCLCompilerTool": {
                 "ExceptionHandling": "2"
