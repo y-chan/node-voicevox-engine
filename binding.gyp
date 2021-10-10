@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "core",
+      "target_name": "engine",
       "sources": [
         "engine.cc",
         "engine.h",
