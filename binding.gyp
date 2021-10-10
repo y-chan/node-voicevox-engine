@@ -11,6 +11,7 @@
         "engine/acoustic_feature_extractor.h",
         "engine/full_context_label.cc",
         "engine/full_context_label.h",
+        "engine/mora_list.h",
         "engine/openjtalk.cc",
         "engine/openjtalk.h",
         "engine/synthesis_engine.cc",
