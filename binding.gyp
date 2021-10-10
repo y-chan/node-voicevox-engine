@@ -13,6 +13,7 @@
         "engine/full_context_label.h",
         "engine/kana_parser.cc",
         "engine/kana_parser.h",
+        "engine/mora_list.cc",
         "engine/mora_list.h",
         "engine/openjtalk.cc",
         "engine/openjtalk.h",
