@@ -15,7 +15,7 @@ public:
     EngineWrapper(const Napi::CallbackInfo& info);
     ~EngineWrapper();
 
-    Napi::Value EngineWrapper::audio_query(const Napi::CallbackInfo& info);
+    Napi::Value audio_query(const Napi::CallbackInfo& info);
     Napi::Value metas(const Napi::CallbackInfo& info);
 
     Napi::Value yukarin_s_forward(const Napi::CallbackInfo& info);
