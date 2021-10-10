@@ -2,6 +2,7 @@
 const addon = require('bindings')('engine')
 
 interface IEngine {
+  audio_query(text: string, speaker_id: number): Object
   metas(): string
   yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[]
   yukarin_sa_forward(
@@ -42,7 +43,16 @@ class Engine implements IEngine {
     libraryRootDirPath?: string
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-    this.addon = new addon(coreFilePath, useGpu, libraryRootDirPath)
+    this.addon = new addon(
+      __dirname + '/open_jtalk_dic_utf_8-1.11',
+      coreFilePath,
+      useGpu,
+      libraryRootDirPath
+    )
+  }
+
+  audio_query(text: string, speaker_id: number): Object {
+    return this.addon.audio_query(text, speaker_id)
   }
 
   /**
