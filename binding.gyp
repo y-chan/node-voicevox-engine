@@ -92,7 +92,8 @@
               "HAVE_UNISTD_H",
               "HAVE_SYS_STAT_H",
               "HAVE_FCNTL_H",
-              "HAVE_DIRENT_H"
+              "HAVE_DIRENT_H",
+              "HAVE_STDINT_H"
             ]
           }
         ]
