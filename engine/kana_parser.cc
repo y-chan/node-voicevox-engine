@@ -120,7 +120,7 @@ Napi::Array parse_kana(Napi::Env env, std::string text) {
             Napi::Object accent_phrase = text_to_accent_phrase(env, phrase);
             if (i < text.size() && letter == PAUSE_DELIMITER) {
                 Napi::Object pause_mora = Napi::Object::New(env);
-                pause_mora.Set("text", "A");
+                pause_mora.Set("text", "ã€");
                 pause_mora.Set("vowel", "pau");
                 pause_mora.Set("vowel_length", 0.0f);
                 pause_mora.Set("pitch", 0.0f);
