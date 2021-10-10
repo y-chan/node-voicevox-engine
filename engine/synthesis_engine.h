@@ -34,6 +34,7 @@ public:
         m_core = core;
     }
 
+    Napi::Array *replace_mora_data(Napi::Array *accent_phrases, long speaker_id);
     Napi::Array *replace_phoneme_length(Napi::Array *accent_phrases, long speaker_id);
     Napi::Array *replace_mora_pitch(Napi::Array *accent_phrases, long speaker_id);
     Napi::Array synthesis_array(Napi::Env env, Napi::Object query, long speaker_id);

@@ -63,6 +63,13 @@ void split_mora(
     return;
 }
 
+
+Napi::Array *SynthesisEngine::replace_mora_data(Napi::Array *accent_phrases, long speaker_id) {
+    replace_phoneme_length(accent_phrases, speaker_id);
+    replace_mora_pitch(accent_phrases, speaker_id);
+    return accent_phrases;
+}
+
 Napi::Array *SynthesisEngine::replace_phoneme_length(Napi::Array *accent_phrases, long speaker_id) {
     std::vector<Napi::Object *> flatten_moras;
     std::vector<std::string> phoneme_str_list;
