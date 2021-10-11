@@ -184,7 +184,7 @@ Utterance Utterance::from_phonemes(std::vector<Phoneme *> phonemes) {
     std::vector<Phoneme *> pauses;
 
     for (Phoneme *phoneme : phonemes) {
-        if (phoneme->is_pause()) {
+        if (!phoneme->is_pause()) {
             group_phonemes.push_back(phoneme);
         } else {
             pauses.push_back(phoneme);
