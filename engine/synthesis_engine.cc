@@ -140,7 +140,7 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
         base_start_accent_list.push_back(0);
 
         base_end_accent_list.push_back(0);
-        int accent = accent_phrase_object.Get("accent").As<Napi::Number>().Int32Value() - 1;
+        accent = accent_phrase_object.Get("accent").As<Napi::Number>().Int32Value() - 1;
         create_one_accent_list(base_end_accent_list, accent_phrase_object, accent);
         base_end_accent_list.push_back(0);
 
