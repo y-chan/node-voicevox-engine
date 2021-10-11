@@ -43,7 +43,7 @@ void split_mora(
             mora_phoneme_list.end(),
             phoneme_list[i].phoneme
         );
-        if (result == mora_phoneme_list.end()) {
+        if (result != mora_phoneme_list.end()) {
             vowel_indexes.push_back((long)i);
         }
     }
