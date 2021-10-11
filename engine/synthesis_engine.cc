@@ -87,7 +87,7 @@ Napi::Array SynthesisEngine::replace_phoneme_length(Napi::Array accent_phrases, 
 
     std::vector<long> phoneme_list_s;
     for (OjtPhoneme phoneme_data : phoneme_data_list) phoneme_list_s.push_back(phoneme_data.phoneme_id());
-    std::vector<float> phoneme_length;
+    std::vector<float> phoneme_length(phoneme_list_s.size(), 0.0);
     bool success = m_core->yukarin_s_forward(phoneme_list_s.size(), phoneme_list_s.data(), &speaker_id, phoneme_length.data());
 
     if (!success) {
