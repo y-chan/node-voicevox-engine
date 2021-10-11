@@ -31,6 +31,11 @@ export interface AudioQuery {
 
 interface IEngine {
   audio_query(text: string, speaker_id: number): AudioQuery
+  accent_phrases(
+    text: string,
+    speaker_id: number,
+    is_kana?: boolean
+  ): AccentPhrases
   metas(): string
   yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[]
   yukarin_sa_forward(
@@ -81,6 +86,14 @@ class Engine implements IEngine {
 
   audio_query(text: string, speaker_id: number): AudioQuery {
     return this.addon.audio_query(text, speaker_id)
+  }
+
+  accent_phrases(
+    text: string,
+    speaker_id: number,
+    is_kana?: boolean
+  ): AccentPhrases {
+    return this.addon.accent_phrases(text, speaker_id, is_kana || false)
   }
 
   /**

@@ -16,6 +16,8 @@ public:
     ~EngineWrapper();
 
     Napi::Value audio_query(const Napi::CallbackInfo& info);
+    Napi::Value accent_phrases(const Napi::CallbackInfo& info);
+
     Napi::Value metas(const Napi::CallbackInfo& info);
 
     Napi::Value yukarin_s_forward(const Napi::CallbackInfo& info);

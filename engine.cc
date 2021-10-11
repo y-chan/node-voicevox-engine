@@ -34,6 +34,7 @@ Napi::Object EngineWrapper::Init(Napi::Env env, Napi::Object exports)
     Napi::Function func = DefineClass(
         env, "EngineWrapper", {
             InstanceMethod("audio_query", &EngineWrapper::audio_query),
+            InstanceMethod("accent_phrases", &EngineWrapper::accent_phrases),
             InstanceMethod("metas", &EngineWrapper::metas),
             InstanceMethod("yukarin_s_forward", &EngineWrapper::yukarin_s_forward),
             InstanceMethod("yukarin_sa_forward", &EngineWrapper::yukarin_sa_forward),
@@ -209,6 +210,36 @@ Napi::Value EngineWrapper::audio_query(const Napi::CallbackInfo& info) {
     audio_query.Set("kana", kana);
 
     return audio_query;
+}
+
+Napi::Value EngineWrapper::accent_phrases(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 3) {
+        Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (!info[0].IsString() || !info[1].IsNumber() || !info[2].IsBoolean()) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::Array accent_phrases;
+    if (info[2].As<Napi::Boolean>().Value()) {
+        try {
+            accent_phrases = parse_kana(env, info[0].As<Napi::String>().Utf8Value());
+        }
+        catch (std::exception& err) {
+            Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
+            return env.Null();
+        }
+        accent_phrases = m_engine->replace_mora_data(accent_phrases, info[1].As<Napi::Number>().Int64Value());
+    }
+    else {
+        accent_phrases = create_accent_phrases(env, info[0].As<Napi::String>(), info[1].As<Napi::Number>());
+    }
+
+    return accent_phrases;
 }
 
 Napi::Value EngineWrapper::metas(const Napi::CallbackInfo& info)
