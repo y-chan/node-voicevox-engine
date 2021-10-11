@@ -251,6 +251,7 @@ Napi::Value EngineWrapper::mora_data(const Napi::CallbackInfo& info) {
         return env.Null();
     }
 
+    // TODO: 厳密な型検査を行いたいが、パフォーマンスの低下が懸念
     if (!info[0].IsArray() || !info[1].IsNumber()) {
         Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
         return env.Null();
@@ -266,6 +267,7 @@ Napi::Value EngineWrapper::mora_length(const Napi::CallbackInfo& info) {
         return env.Null();
     }
 
+    // TODO: 厳密な型検査
     if (!info[0].IsArray() || !info[1].IsNumber()) {
         Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
         return env.Null();
