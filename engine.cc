@@ -38,6 +38,7 @@ Napi::Object EngineWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("mora_data", &EngineWrapper::mora_data),
             InstanceMethod("mora_length", &EngineWrapper::mora_length),
             InstanceMethod("mora_pitch", &EngineWrapper::mora_pitch),
+            InstanceMethod("synthesis", &EngineWrapper::synthesis),
             InstanceMethod("metas", &EngineWrapper::metas),
             InstanceMethod("yukarin_s_forward", &EngineWrapper::yukarin_s_forward),
             InstanceMethod("yukarin_sa_forward", &EngineWrapper::yukarin_sa_forward),
@@ -291,6 +292,65 @@ Napi::Value EngineWrapper::mora_pitch(const Napi::CallbackInfo& info) {
     }
 
     return m_engine->replace_mora_pitch(info[0].As<Napi::Array>(), info[1].As<Napi::Number>().Int64Value());
+}
+
+Napi::Value EngineWrapper::synthesis(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 2) {
+        Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (!info[0].IsObject() || !info[1].IsNumber()) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    Napi::Object audio_query = info[0].As<Napi::Object>();
+    if (
+        !audio_query.Has("accent_phrases") ||
+        !audio_query.Has("speedScale") ||
+        !audio_query.Has("pitchScale") ||
+        !audio_query.Has("intonationScale") ||
+        !audio_query.Has("volumeScale") ||
+        !audio_query.Has("prePhonemeLength") ||
+        !audio_query.Has("postPhonemeLength") ||
+        !audio_query.Has("outputSamplingRate") ||
+        !audio_query.Has("outputStereo") ||
+        !audio_query.Has("kana")
+    ) {
+        Napi::TypeError::New(env, "wrong audio query").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    // TODO: accent_phraseの厳密な型検査
+    Napi::Value accent_phrases = audio_query.Get("accent_phrases");
+    Napi::Value speed_scale = audio_query.Get("speedScale");
+    Napi::Value pitch_scale = audio_query.Get("pitchScale");
+    Napi::Value intonation_scale = audio_query.Get("intonationScale");
+    Napi::Value volume_scale = audio_query.Get("volumeScale");
+    Napi::Value pre_phoneme_length = audio_query.Get("prePhonemeLength");
+    Napi::Value post_phoneme_length = audio_query.Get("postPhonemeLength");
+    Napi::Value output_sampling_rate = audio_query.Get("outputSamplingRate");
+    Napi::Value output_stereo = audio_query.Get("outputStereo");
+    Napi::Value kana = audio_query.Get("kana");
+
+    if (!accent_phrases.IsArray() ||
+        !speed_scale.IsNumber() ||
+        !pitch_scale.IsNumber() ||
+        !intonation_scale.IsNumber() ||
+        !volume_scale.IsNumber() ||
+        !pre_phoneme_length.IsNumber() ||
+        !post_phoneme_length.IsNumber() ||
+        !output_sampling_rate.IsNumber() ||
+        !output_stereo.IsBoolean() ||
+        !kana.IsString()
+    ) {
+        Napi::TypeError::New(env, "wrong audio query params").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    return m_engine->synthesis_wave_format(env, audio_query, info[1].As<Napi::Number>().Int64Value());
 }
 
 Napi::Value EngineWrapper::metas(const Napi::CallbackInfo& info)

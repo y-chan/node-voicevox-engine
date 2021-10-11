@@ -20,6 +20,7 @@ public:
     Napi::Value mora_data(const Napi::CallbackInfo& info);
     Napi::Value mora_length(const Napi::CallbackInfo& info);
     Napi::Value mora_pitch(const Napi::CallbackInfo& info);
+    Napi::Value synthesis(const Napi::CallbackInfo& info);
 
     Napi::Value metas(const Napi::CallbackInfo& info);
 
