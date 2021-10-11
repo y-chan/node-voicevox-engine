@@ -36,6 +36,7 @@ interface IEngine {
     speaker_id: number,
     is_kana?: boolean
   ): AccentPhrase[]
+  mora_data(accent_phrases: AccentPhrase[], speaker_id: number): AccentPhrase[]
   metas(): string
   yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[]
   yukarin_sa_forward(
@@ -94,6 +95,13 @@ class Engine implements IEngine {
     is_kana?: boolean
   ): AccentPhrase[] {
     return this.addon.accent_phrases(text, speaker_id, is_kana || false)
+  }
+
+  mora_data(
+    accent_phrases: AccentPhrase[],
+    speaker_id: number
+  ): AccentPhrase[] {
+    return this.addon.mora_data(accent_phrases, speaker_id)
   }
 
   /**

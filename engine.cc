@@ -35,6 +35,7 @@ Napi::Object EngineWrapper::Init(Napi::Env env, Napi::Object exports)
         env, "EngineWrapper", {
             InstanceMethod("audio_query", &EngineWrapper::audio_query),
             InstanceMethod("accent_phrases", &EngineWrapper::accent_phrases),
+            InstanceMethod("mora_data", &EngineWrapper::mora_data),
             InstanceMethod("metas", &EngineWrapper::metas),
             InstanceMethod("yukarin_s_forward", &EngineWrapper::yukarin_s_forward),
             InstanceMethod("yukarin_sa_forward", &EngineWrapper::yukarin_sa_forward),
@@ -240,6 +241,21 @@ Napi::Value EngineWrapper::accent_phrases(const Napi::CallbackInfo& info) {
     }
 
     return accent_phrases;
+}
+
+Napi::Value EngineWrapper::mora_data(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 2) {
+        Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (!info[0].IsArray() || !info[1].IsNumber()) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    return m_engine->replace_mora_data(info[0].As<Napi::Array>(), info[1].As<Napi::Number>().Int64Value());
 }
 
 Napi::Value EngineWrapper::metas(const Napi::CallbackInfo& info)
