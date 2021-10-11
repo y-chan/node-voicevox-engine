@@ -32,9 +32,9 @@ public:
         this->vowel = vowel;
     }
 
-    Mora(Phoneme *vowel, Phoneme *consonant) {
-        this->vowel = vowel;
+    Mora(Phoneme *consonant, Phoneme *vowel) {
         this->consonant = consonant;
+        this->vowel = vowel;
     }
 
     void set_context(std::string key, std::string value);
