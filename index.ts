@@ -91,10 +91,25 @@ class Engine implements IEngine {
     )
   }
 
+  /**
+   * 音声合成用のクエリを作成する
+   * クエリの初期値を得ます。
+   * ここで得られたクエリはそのまま音声合成に利用できます。
+   * @param {string} text - 音声合成用の文字列
+   * @param {number} speaker_id - 話者ID
+   * @return {AudioQuery} - 音声合成用のクエリ
+   */
   audio_query(text: string, speaker_id: number): AudioQuery {
     return this.addon.audio_query(text, speaker_id)
   }
 
+  /**
+   * テキストからアクセント句を得る
+   * @param {string} text - アクセント句を取得したい文字列
+   * @param {number} speaker_id - 話者ID
+   * @param {boolean} is_kana - AquesTalkライクな記法の文字列かどうか
+   * @return {AccentPhrase[]} - アクセント句
+   */
   accent_phrases(
     text: string,
     speaker_id: number,
@@ -103,6 +118,12 @@ class Engine implements IEngine {
     return this.addon.accent_phrases(text, speaker_id, is_kana || false)
   }
 
+  /**
+   * アクセント句から音高・音素長を得る
+   * @param {AccentPhrase[]} accent_phrases - アクセント句
+   * @param {number} speaker_id - 話者ID
+   * @return {AccentPhrase[]} - 編集されたアクセント句
+   */
   mora_data(
     accent_phrases: AccentPhrase[],
     speaker_id: number
@@ -110,6 +131,12 @@ class Engine implements IEngine {
     return this.addon.mora_data(accent_phrases, speaker_id)
   }
 
+  /**
+   * アクセント句から音素長を得る
+   * @param {AccentPhrase[]} accent_phrases - アクセント句
+   * @param {number} speaker_id - 話者ID
+   * @return {AccentPhrase[]} - 編集されたアクセント句
+   */
   mora_length(
     accent_phrases: AccentPhrase[],
     speaker_id: number
@@ -117,6 +144,12 @@ class Engine implements IEngine {
     return this.addon.mora_length(accent_phrases, speaker_id)
   }
 
+  /**
+   * アクセント句から音高を得る
+   * @param {AccentPhrase[]} accent_phrases - アクセント句
+   * @param {number} speaker_id - 話者ID
+   * @return {AccentPhrase[]} - 編集されたアクセント句
+   */
   mora_pitch(
     accent_phrases: AccentPhrase[],
     speaker_id: number
@@ -124,6 +157,12 @@ class Engine implements IEngine {
     return this.addon.mora_pitch(accent_phrases, speaker_id)
   }
 
+  /**
+   * 音声合成をする
+   * @param {AudioQuery} audio_query - 音声合成用のクエリ
+   * @param {number} speaker_id - 話者ID
+   * @return {Buffer} - 音声合成されたwav形式のバイナリ
+   */
   synthesis(audio_query: AudioQuery, speaker_id: number): Buffer {
     return this.addon.synthesis(audio_query, speaker_id)
   }
