@@ -79,7 +79,7 @@ class Engine implements IEngine {
     )
   }
 
-  audio_query(text: string, speaker_id: number): Object {
+  audio_query(text: string, speaker_id: number): AudioQuery {
     return this.addon.audio_query(text, speaker_id)
   }
 
