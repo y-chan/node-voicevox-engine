@@ -10,14 +10,14 @@ export interface Mora {
   pitch: number
 }
 
-export interface AccentPhrases {
+export interface AccentPhrase {
   moras: Mora[]
   accent: number
   pause_mora?: Mora
 }
 
 export interface AudioQuery {
-  accent_phrases: AccentPhrases[]
+  accent_phrases: AccentPhrase[]
   speedScale: number
   pitchScale: number
   intonationScale: number
@@ -35,7 +35,7 @@ interface IEngine {
     text: string,
     speaker_id: number,
     is_kana?: boolean
-  ): AccentPhrases
+  ): AccentPhrase[]
   metas(): string
   yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[]
   yukarin_sa_forward(
@@ -92,7 +92,7 @@ class Engine implements IEngine {
     text: string,
     speaker_id: number,
     is_kana?: boolean
-  ): AccentPhrases {
+  ): AccentPhrase[] {
     return this.addon.accent_phrases(text, speaker_id, is_kana || false)
   }
 
