@@ -127,6 +127,10 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
     initail_process(accent_phrases, flatten_moras, phoneme_str_list, phoneme_data_list);
 
     std::vector<long> base_start_accent_list;
+    std::vector<long> base_end_accent_list;
+    std::vector<long> base_start_accent_phrase_list;
+    std::vector<long> base_end_accent_phrase_list;
+
     for (uint32_t i = 0; i < accent_phrases.Length(); i++) {
         base_start_accent_list.push_back(0);
         Napi::Value accent_phrase = accent_phrases[i];
@@ -134,32 +138,17 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
         int accent = accent_phrase_object.Get("accent").As<Napi::Number>().Int32Value() == 1 ? 0 : 1;
         create_one_accent_list(base_start_accent_list, accent_phrase_object, accent);
         base_start_accent_list.push_back(0);
-    }
 
-    std::vector<long> base_end_accent_list;
-    for (uint32_t i = 0; i < accent_phrases.Length(); i++) {
         base_end_accent_list.push_back(0);
-        Napi::Value accent_phrase = accent_phrases[i];
-        Napi::Object accent_phrase_object = accent_phrase.As<Napi::Object>();
         int accent = accent_phrase_object.Get("accent").As<Napi::Number>().Int32Value() - 1;
         create_one_accent_list(base_end_accent_list, accent_phrase_object, accent);
         base_end_accent_list.push_back(0);
-    }
 
-    std::vector<long> base_start_accent_phrase_list;
-    for (uint32_t i = 0; i < accent_phrases.Length(); i++) {
         base_start_accent_phrase_list.push_back(0);
-        Napi::Value accent_phrase = accent_phrases[i];
-        Napi::Object accent_phrase_object = accent_phrase.As<Napi::Object>();
         create_one_accent_list(base_start_accent_phrase_list, accent_phrase_object, 0);
         base_start_accent_phrase_list.push_back(0);
-    }
 
-    std::vector<long> base_end_accent_phrase_list;
-    for (uint32_t i = 0; i < accent_phrases.Length(); i++) {
         base_end_accent_phrase_list.push_back(0);
-        Napi::Value accent_phrase = accent_phrases[i];
-        Napi::Object accent_phrase_object = accent_phrase.As<Napi::Object>();
         create_one_accent_list(base_end_accent_phrase_list, accent_phrase_object, -1);
         base_end_accent_phrase_list.push_back(0);
     }
