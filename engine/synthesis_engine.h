@@ -22,7 +22,7 @@ std::vector<OjtPhoneme> to_phoneme_data_list(std::vector<std::string> phoneme_st
 void split_mora(
     std::vector<OjtPhoneme> phoneme_list,
     std::vector<OjtPhoneme *> &consonant_phoneme_list,
-    std::vector<OjtPhoneme *> &vowel_phoneme_list,
+    std::vector<OjtPhoneme> &vowel_phoneme_list,
     std::vector<long> &vowel_indexes
 );
 
