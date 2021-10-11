@@ -17,7 +17,7 @@ public:
         this->label = label;
     }
 
-    static Phoneme from_label(const std::string label);
+    static Phoneme *from_label(const std::string label);
 
     const std::string phoneme();
     const bool is_pause();
@@ -28,65 +28,65 @@ public:
     Phoneme *consonant = nullptr;
     Phoneme *vowel;
 
-    Mora(Phoneme vowel) {
-        this->vowel = &vowel;
+    Mora(Phoneme *vowel) {
+        this->vowel = vowel;
     }
 
-    Mora(Phoneme vowel, Phoneme consonant) {
-        this->vowel = &vowel;
-        this->consonant = &consonant;
+    Mora(Phoneme *vowel, Phoneme *consonant) {
+        this->vowel = vowel;
+        this->consonant = consonant;
     }
 
     void set_context(std::string key, std::string value);
-    const std::vector<Phoneme> phonemes();
+    const std::vector<Phoneme *> phonemes();
     const std::vector<std::string> labels();
 };
 
 
 class AccentPhrase {
 public:
-    std::vector<Mora> moras;
+    std::vector<Mora *> moras;
     int accent;
 
-    AccentPhrase(std::vector<Mora> moras, int accent) {
+    AccentPhrase(std::vector<Mora *> moras, int accent) {
         this->moras = moras;
         this->accent = accent;
     }
 
-    static AccentPhrase from_phonemes(std::vector<Phoneme> phonemes);
+    static AccentPhrase *from_phonemes(std::vector<Phoneme *> phonemes);
     void set_context(std::string key, std::string value);
-    const std::vector<Phoneme> phonemes();
+    const std::vector<Phoneme *> phonemes();
     const std::vector<std::string> labels();
-    AccentPhrase merge(AccentPhrase accent_phrase);
+    AccentPhrase *merge(AccentPhrase *accent_phrase);
 };
 
 class BreathGroup {
 public:
-    std::vector<AccentPhrase> accent_phrases;
+    std::vector<AccentPhrase *> accent_phrases;
 
-    BreathGroup(std::vector<AccentPhrase> accent_phrases) {
+    BreathGroup(std::vector<AccentPhrase *> accent_phrases) {
         this->accent_phrases = accent_phrases;
     }
 
-    static BreathGroup from_phonemes(std::vector<Phoneme> phonemes);
+    static BreathGroup *from_phonemes(std::vector<Phoneme *> phonemes);
     void set_context(std::string key, std::string value);
-    const std::vector<Phoneme> phonemes();
+    const std::vector<Phoneme *> phonemes();
     const std::vector<std::string> labels();
 };
 
 class Utterance {
 public:
-    std::vector<BreathGroup> breath_groups;
-    std::vector<Phoneme> pauses;
+    std::vector<BreathGroup *> breath_groups;
+    std::vector<Phoneme *> pauses;
 
-    Utterance(std::vector<BreathGroup> breath_groups, std::vector<Phoneme> pauses) {
+    Utterance(std::vector<BreathGroup *> breath_groups, std::vector<Phoneme *> pauses) {
         this->breath_groups = breath_groups;
         this->pauses = pauses;
     }
 
-    static Utterance from_phonemes(std::vector<Phoneme> phonemes);
+    static Utterance from_phonemes(std::vector<Phoneme *> phonemes);
     void set_context(std::string key, std::string value);
-    const std::vector<Phoneme> phonemes();
+    const std::vector<Phoneme *> phonemes();
     const std::vector<std::string> labels();
 };
 

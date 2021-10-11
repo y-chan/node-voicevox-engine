@@ -113,31 +113,31 @@ Napi::Array EngineWrapper::create_accent_phrases(Napi::Env env, Napi::String tex
     }
 
     int accent_phrases_size = 0;
-    for (BreathGroup breath_group : utterance.breath_groups) accent_phrases_size += breath_group.accent_phrases.size();
+    for (BreathGroup *breath_group : utterance.breath_groups) accent_phrases_size += breath_group->accent_phrases.size();
     Napi::Array accent_phrases = Napi::Array::New(env, accent_phrases_size);
 
     int accent_phrases_count = 0;
     for (size_t i = 0; i < utterance.breath_groups.size(); i++) {
-        BreathGroup breath_group = utterance.breath_groups[i];
-        for (size_t j = 0; j < breath_group.accent_phrases.size(); j++) {
-            AccentPhrase accent_phrase = breath_group.accent_phrases[j];
+        BreathGroup *breath_group = utterance.breath_groups[i];
+        for (size_t j = 0; j < breath_group->accent_phrases.size(); j++) {
+            AccentPhrase *accent_phrase = breath_group->accent_phrases[j];
             Napi::Object new_accent_phrase = Napi::Object::New(env);
 
-            Napi::Array moras = Napi::Array::New(env, accent_phrase.moras.size());
-            for (size_t k = 0; k < accent_phrase.moras.size(); k++) {
-                Mora mora = accent_phrase.moras[k];
+            Napi::Array moras = Napi::Array::New(env, accent_phrase->moras.size());
+            for (size_t k = 0; k < accent_phrase->moras.size(); k++) {
+                Mora *mora = accent_phrase->moras[k];
                 Napi::Object new_mora = Napi::Object::New(env);
 
                 std::string moras_text = "";
-                for (Phoneme phoneme : mora.phonemes()) moras_text += phoneme.phoneme();
+                for (Phoneme *phoneme : mora->phonemes()) moras_text += phoneme->phoneme();
                 std::transform(moras_text.begin(), moras_text.end(), moras_text.begin(), ::tolower);
                 new_mora.Set("text", mora2text(moras_text));
 
-                if (mora.consonant != nullptr) {
-                    new_mora.Set("consonant", mora.consonant->phoneme());
+                if (mora->consonant != nullptr) {
+                    new_mora.Set("consonant", mora->consonant->phoneme());
                     new_mora.Set("consonant_length", 0.0f);
                 }
-                new_mora.Set("vowel", mora.vowel->phoneme());
+                new_mora.Set("vowel", mora->vowel->phoneme());
                 new_mora.Set("vowel_length", 0.0f);
                 new_mora.Set("pitch", 0.0f);
 
@@ -145,9 +145,9 @@ Napi::Array EngineWrapper::create_accent_phrases(Napi::Env env, Napi::String tex
             }
 
             new_accent_phrase.Set("moras", moras);
-            new_accent_phrase.Set("accent", accent_phrase.accent);
+            new_accent_phrase.Set("accent", accent_phrase->accent);
 
-            if (i != utterance.breath_groups.size() - 1 && j == breath_group.accent_phrases.size() - 1) {
+            if (i != utterance.breath_groups.size() - 1 && j == breath_group->accent_phrases.size() - 1) {
                 Napi::Object pause_mora = Napi::Object::New(env);
                 pause_mora.Set("text", "、");
                 pause_mora.Set("vowel", "pau");
