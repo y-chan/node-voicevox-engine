@@ -142,10 +142,11 @@ BreathGroup *BreathGroup::from_phonemes(std::vector<Phoneme *> phonemes) {
 
         if (
             i + 1 == phonemes.size() ||
-            phonemes[i]->contexts.at("i3") == phonemes[i + 1]->contexts.at("i3") ||
-            phonemes[i]->contexts.at("f5") == phonemes[i + 1]->contexts.at("f5")
+            phonemes[i]->contexts.at("i3") != phonemes[i + 1]->contexts.at("i3") ||
+            phonemes[i]->contexts.at("f5") != phonemes[i + 1]->contexts.at("f5")
         ) {
             accent_phrases.push_back(AccentPhrase::from_phonemes(accent_phonemes));
+            accent_phonemes.clear();
         }
     }
 
