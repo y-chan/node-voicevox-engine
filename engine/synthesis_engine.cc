@@ -105,7 +105,7 @@ Napi::Array SynthesisEngine::replace_phoneme_length(Napi::Array accent_phrases, 
             if (mora_object.Get("consonant").IsString()) mora_object.Set("consonant_length", phoneme_length[vowel_indexes_data[index + 1] - 1]);
             mora_object.Set("vowel_length", phoneme_length[vowel_indexes_data[index + 1]]);
             index++;
-            moras.Set(j, mora);
+            moras.Set(j, mora_object);
         }
         accent_phrase_object.Set("moras", moras);
         if (accent_phrase_object.Has("pause_mora")) {
@@ -220,7 +220,7 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
             Napi::Object mora_object = mora.As<Napi::Object>();
             mora_object.Set("pitch", f0_list[index + 1]);
             index++;
-            moras.Set(j, mora);
+            moras.Set(j, mora_object);
         }
         accent_phrase_object.Set("moras", moras);
         if (accent_phrase_object.Has("pause_mora")) {
