@@ -24,7 +24,7 @@ Napi::Object EngineWrapper::NewInstance(Napi::Env env, const Napi::CallbackInfo&
         return Napi::Object::New(env);
     }
 
-    const std::initializer_list<napi_value> initArgList = { info[0], info[1], info[2] };
+    const std::initializer_list<napi_value> initArgList = { info[0], info[1], info[2], info[3] };
     Napi::Object obj = env.GetInstanceData<Napi::FunctionReference>()->New(initArgList);
     return scope.Escape(napi_value(obj)).ToObject();
 }
