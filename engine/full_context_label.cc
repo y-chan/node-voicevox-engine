@@ -23,7 +23,7 @@ Phoneme *Phoneme::from_label(const std::string label) {
             "g1", "g2", "g3", "g4", "g5", "h1", "h2", "i1", "i2", "i3",
             "i4", "i5", "i6", "i7", "i8", "j1", "j2", "k1", "k2", "k3"
         };
-        for (int i = 1; i < match.size(); i++) contexts[keys[i]] = match[i];
+        for (int i = 1; i < match.size(); i++) contexts[keys[i-1]] = match[i];
         return new Phoneme(contexts, label);
     } else {
         throw std::runtime_error("label is broken");
