@@ -18,6 +18,7 @@ public:
     Napi::Value audio_query(const Napi::CallbackInfo& info);
     Napi::Value accent_phrases(const Napi::CallbackInfo& info);
     Napi::Value mora_data(const Napi::CallbackInfo& info);
+    Napi::Value mora_length(const Napi::CallbackInfo& info);
 
     Napi::Value metas(const Napi::CallbackInfo& info);
 
