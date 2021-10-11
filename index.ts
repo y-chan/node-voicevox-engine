@@ -41,6 +41,7 @@ interface IEngine {
     accent_phrases: AccentPhrase[],
     speaker_id: number
   ): AccentPhrase[]
+  mora_pitch(accent_phrases: AccentPhrase[], speaker_id: number): AccentPhrase[]
   metas(): string
   yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[]
   yukarin_sa_forward(
@@ -113,6 +114,13 @@ class Engine implements IEngine {
     speaker_id: number
   ): AccentPhrase[] {
     return this.addon.mora_length(accent_phrases, speaker_id)
+  }
+
+  mora_pitch(
+    accent_phrases: AccentPhrase[],
+    speaker_id: number
+  ): AccentPhrase[] {
+    return this.addon.mora_pitch(accent_phrases, speaker_id)
   }
 
   /**

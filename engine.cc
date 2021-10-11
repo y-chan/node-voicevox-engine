@@ -37,6 +37,7 @@ Napi::Object EngineWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("accent_phrases", &EngineWrapper::accent_phrases),
             InstanceMethod("mora_data", &EngineWrapper::mora_data),
             InstanceMethod("mora_length", &EngineWrapper::mora_length),
+            InstanceMethod("mora_pitch", &EngineWrapper::mora_pitch),
             InstanceMethod("metas", &EngineWrapper::metas),
             InstanceMethod("yukarin_s_forward", &EngineWrapper::yukarin_s_forward),
             InstanceMethod("yukarin_sa_forward", &EngineWrapper::yukarin_sa_forward),
@@ -274,6 +275,22 @@ Napi::Value EngineWrapper::mora_length(const Napi::CallbackInfo& info) {
     }
 
     return m_engine->replace_phoneme_length(info[0].As<Napi::Array>(), info[1].As<Napi::Number>().Int64Value());
+}
+
+Napi::Value EngineWrapper::mora_pitch(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 2) {
+        Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    // TODO: 厳密な型検査
+    if (!info[0].IsArray() || !info[1].IsNumber()) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    return m_engine->replace_mora_pitch(info[0].As<Napi::Array>(), info[1].As<Napi::Number>().Int64Value());
 }
 
 Napi::Value EngineWrapper::metas(const Napi::CallbackInfo& info)
