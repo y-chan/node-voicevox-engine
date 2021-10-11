@@ -83,7 +83,7 @@ AccentPhrase AccentPhrase::from_phonemes(std::vector<Phoneme> phonemes) {
                 throw std::runtime_error("too long mora");
             }
             moras.push_back(*mora);
-            moras.clear();
+            mora_phonemes.clear();
         }
     }
 
