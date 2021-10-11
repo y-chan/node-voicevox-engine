@@ -1,8 +1,36 @@
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 const addon = require('bindings')('engine')
 
+export interface Mora {
+  text: string
+  consonant?: string
+  consonant_length?: number
+  vowel: string
+  vowel_length: number
+  pitch: number
+}
+
+export interface AccentPhrases {
+  moras: Mora[]
+  accent: number
+  pause_mora?: Mora
+}
+
+export interface AudioQuery {
+  accent_phrases: AccentPhrases[]
+  speedScale: number
+  pitchScale: number
+  intonationScale: number
+  volumeScale: number
+  prePhonemeLength: number
+  postPhonemeLength: number
+  outputSamplingRate: number
+  outputStereo: boolean
+  kana: string
+}
+
 interface IEngine {
-  audio_query(text: string, speaker_id: number): Object
+  audio_query(text: string, speaker_id: number): AudioQuery
   metas(): string
   yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[]
   yukarin_sa_forward(
