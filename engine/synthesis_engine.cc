@@ -225,7 +225,7 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
         accent_phrase_object.Set("moras", moras);
         if (accent_phrase_object.Has("pause_mora")) {
             Napi::Object pause_mora = accent_phrase_object.Get("pause_mora").As<Napi::Object>();
-            pause_mora.Set("pitch", f0_list[index + 1]]);
+            pause_mora.Set("pitch", f0_list[index + 1]);
             index++;
             accent_phrase_object.Set("pause_mora", pause_mora);
         }
