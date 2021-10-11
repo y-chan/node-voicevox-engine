@@ -17,7 +17,7 @@ static std::vector<std::string> mora_phoneme_list = {
     "a", "i", "u", "e", "o", "N", "A", "I", "U", "E", "O", "cl", "pau"
 };
 
-std::vector<Napi::Object *> to_flatten_moras(Napi::Array *accent_phrases);
+std::vector<Napi::Object> to_flatten_moras(Napi::Array accent_phrases);
 std::vector<OjtPhoneme> to_phoneme_data_list(std::vector<std::string> phoneme_str_list);
 void split_mora(
     std::vector<OjtPhoneme> phoneme_list,
@@ -34,9 +34,9 @@ public:
         m_core = core;
     }
 
-    Napi::Array *replace_mora_data(Napi::Array *accent_phrases, long speaker_id);
-    Napi::Array *replace_phoneme_length(Napi::Array *accent_phrases, long speaker_id);
-    Napi::Array *replace_mora_pitch(Napi::Array *accent_phrases, long speaker_id);
+    Napi::Array replace_mora_data(Napi::Array accent_phrases, long speaker_id);
+    Napi::Array replace_phoneme_length(Napi::Array accent_phrases, long speaker_id);
+    Napi::Array replace_mora_pitch(Napi::Array accent_phrases, long speaker_id);
     Napi::Array synthesis_array(Napi::Env env, Napi::Object query, long speaker_id);
     Napi::Buffer<uint8_t> synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id);
 private:
@@ -44,8 +44,8 @@ private:
 
     std::vector<float> synthesis(Napi::Object query, long speaker_id);
     void initail_process(
-        Napi::Array* accent_phrases,
-        std::vector<Napi::Object *> &flatten_moras,
+        Napi::Array accent_phrases,
+        std::vector<Napi::Object> &flatten_moras,
         std::vector<std::string> &phoneme_str_list,
         std::vector<OjtPhoneme> &phoneme_data_list
     );

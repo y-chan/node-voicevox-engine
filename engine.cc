@@ -161,7 +161,7 @@ Napi::Array EngineWrapper::create_accent_phrases(Napi::Env env, Napi::String tex
         }
     }
 
-    m_engine->replace_mora_data(&accent_phrases, speaker_id.Int64Value());
+    accent_phrases = m_engine->replace_mora_data(accent_phrases, speaker_id.Int64Value());
 
     return accent_phrases;
 }
