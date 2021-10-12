@@ -6,19 +6,34 @@
 #include <string>
 #include <vector>
 
-template <typename T>
-inline std::vector<T> resample(std::vector<T> base_array, float rate, float sampling_rate, int index = 0, int stride = 1) {
+inline std::vector<float> resample(std::vector<float> base_array, float rate, float sampling_rate, int index = 0) {
     int length = (int)(base_array.size() / rate * sampling_rate);
 
-    std::vector<T> new_array;
+    std::vector<float> new_array;
     float calc_rate = rate / sampling_rate;
     std::random_device seed_gen;
     std::mt19937 engine(seed_gen());
     std::uniform_real_distribution<float> dist(0.0, 1.0);
     float rand_value = dist(engine);
-    for (int i = 0; i < base_array.size(); i++) {
+    for (int i = 0; i < length; i++) {
         int j = (int)((rand_value + (float)(index + i)) * calc_rate);
-        for (int k = 0; k < stride; k++) new_array[i * stride + k] = base_array[j * stride + k];
+        new_array.push_back(base_array[j]);
+    }
+    return new_array;
+}
+
+inline std::vector<float> resample(std::vector<std::vector<float>> base_array, float rate, float sampling_rate, int index = 0) {
+    int length = (int)(base_array.size() / rate * sampling_rate);
+
+    std::vector<float> new_array;
+    float calc_rate = rate / sampling_rate;
+    std::random_device seed_gen;
+    std::mt19937 engine(seed_gen());
+    std::uniform_real_distribution<float> dist(0.0, 1.0);
+    float rand_value = dist(engine);
+    for (int i = 0; i < length; i++) {
+        int j = (int)((rand_value + (float)(index + i)) * calc_rate);
+        std::copy(base_array[j].begin(), base_array[j].end(), std::back_inserter(new_array));
     }
     return new_array;
 }

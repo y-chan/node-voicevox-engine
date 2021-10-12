@@ -415,15 +415,15 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
         }
     }
 
-    f0 = resample<float>(f0, rate, 24000 / 256);
-    phoneme = resample<std::vector<float>>(phoneme, rate, 24000 / 256, 0, 2);
+    f0 = resample(f0, rate, 24000 / 256);
+    std::vector<float> flatten_phoneme = resample(phoneme, rate, 24000 / 256);
 
-    std::vector<float> wave(phoneme.size(), 0.0);
+    std::vector<float> wave(f0.size() * 256, 0.0);
     bool success = m_core->decode_forward(
-        phoneme.size(),
-        phoneme[0].size(),
+        f0.size(),
+        OjtPhoneme::num_phoneme(),
         f0.data(),
-        phoneme[0].data(),
+        flatten_phoneme.data(),
         &speaker_id,
         wave.data()
     );
