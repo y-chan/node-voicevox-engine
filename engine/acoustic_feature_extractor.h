@@ -1,6 +1,7 @@
 #ifndef ACOUSTIC_FEATURE_EXTRACTOR_H
 #define ACOUSTIC_FEATURE_EXTRACTOR_H
 
+#include <iterator>
 #include <map>
 #include <random>
 #include <string>
