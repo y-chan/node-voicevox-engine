@@ -29,6 +29,8 @@ void split_mora(
 class SynthesisEngine {
 public:
     const int default_sampling_rate = 24000;
+    // workaround of Hiroshiba/voicevox_engine#128
+    const float pre_padding_length = 0.4;
 
     SynthesisEngine(Core *core) {
         m_core = core;

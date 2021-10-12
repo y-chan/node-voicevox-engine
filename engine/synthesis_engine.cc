@@ -1,4 +1,5 @@
 #include <iterator>
+#include <iostream>
 
 #include "synthesis_engine.h"
 
@@ -245,9 +246,11 @@ Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, 
     int num_channels = output_stereo ? 2 : 1;
 
     Napi::Array converted_wave = Napi::Array::New(env, wave.size() * num_channels);
-    for (size_t i = 0; i < wave.size(); i++) {
-         converted_wave[i*num_channels] = wave[i] * volume_scale;
-         if (output_stereo) converted_wave[i*num_channels+1] = wave[i] * volume_scale;
+    // workaround of Hiroshiba/voicevox_engine#128
+    for (size_t i = (size_t)((float)default_sampling_rate * pre_padding_length); i < wave.size(); i++) {
+        size_t index = i - (size_t)((float)default_sampling_rate * pre_padding_length);
+        converted_wave[index*num_channels] = wave[i] * volume_scale;
+        if (output_stereo) converted_wave[index*num_channels+1] = wave[i] * volume_scale;
     }
     return converted_wave;
 }
@@ -262,12 +265,6 @@ Napi::Buffer<uint8_t> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi
     uint8_t num_channels = output_stereo ? 2 : 1;
     uint8_t bit_depth = 16;
     int block_size = bit_depth * num_channels / 8;
-
-    if (volume_scale != 1.0) {
-        for (size_t i = 0; i < wave.size(); i++) {
-            wave[i] *= volume_scale;
-        }
-    }
 
     std::vector<uint8_t> wave_buffer;
     wave_buffer.push_back(0x52); // R
@@ -322,7 +319,9 @@ Napi::Buffer<uint8_t> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi
         block_rate >>= 8;
     }
 
-    for (float v : wave) {
+    // workaround of Hiroshiba/voicevox_engine#128
+    for (size_t i = (size_t)((float)default_sampling_rate * pre_padding_length); i < wave.size(); i++) {
+        float v = wave[i] * volume_scale;
         int16_t data = (int16_t)(std::min(1.0f, std::max(v, -1.0f)) * (float)0x7FFF);
         wave_buffer.push_back((uint8_t)(data & 0xff));
         wave_buffer.push_back((uint8_t)((data & 0xff00) >> 8));
@@ -391,6 +390,9 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
     std::vector<OjtPhoneme> vowel_phoneme_data_list;
     std::vector<long> vowel_indexes;
     split_mora(phoneme_data_list, consonant_phoneme_data_list, vowel_phoneme_data_list, vowel_indexes);
+
+    // workaround of Hiroshiba/voicevox_engine#128
+    phoneme_length_list[0] += pre_padding_length;
 
     std::vector<std::vector<float>> phoneme;
     std::vector<float> f0;
