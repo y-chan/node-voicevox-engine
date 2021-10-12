@@ -32,4 +32,5 @@ Windows上で動かすとSegmentation Faultなどの問題を起こし、正し�
 [example](example/index.ts)をご覧ください。
 
 ## ライセンス
-本ライブラリは[LGPL-3.0](LICENSE)でライセンスされています。
+本ライブラリは、[本家VOICEVOX Engine](https://github.com/Hiroshiba/voicevox_engine)のライセンスを継承し、
+[LGPL-3.0](LICENSE)でライセンスされています。
