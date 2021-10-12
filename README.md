@@ -30,6 +30,14 @@ Windows上で動かすとSegmentation Faultなどの問題を起こし、正し�
 
 ## 使用例
 [example](example/index.ts)をご覧ください。
+なお、実行する際は`core.dll`となっている部分をフルパスに変更し、以下のようなコマンドをご利用ください。
+(libtorchの存在する場所によってパスを適切に変更してください。)
+```bash
+# ビルドとOpenJTalk辞書のダウンロード
+yarn inatall
+# 実行
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/libtorch/lib/" yarn example
+```
 
 ## ライセンス
 本ライブラリは、[本家VOICEVOX Engine](https://github.com/Hiroshiba/voicevox_engine)のライセンスを継承し、
