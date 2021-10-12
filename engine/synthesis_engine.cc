@@ -398,7 +398,7 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
     int f0_count = 0;
     long *p_vowel_index = vowel_indexes.data();
     for (size_t i = 0; i < phoneme_length_list.size(); i++) {
-        int phoneme_length = (int)std::round((std::round(phoneme_length_list[i] * rate) / speed_scale) * rate);
+        int phoneme_length = (int)std::round((std::round(phoneme_length_list[i] * rate) / speed_scale));
         long phoneme_id = phoneme_data_list[i].phoneme_id();
         for (int j = 0; j < phoneme_length; j++) {
             std::vector<float> phonemes_vector(OjtPhoneme::num_phoneme(), 0.0);
