@@ -410,6 +410,7 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
             for (long k = 0; k < phoneme_length_sum; k++) {
                 f0.push_back(f0_list[f0_count]);
             }
+            f0_count++;
             phoneme_length_sum = 0;
             p_vowel_index++;
         }
