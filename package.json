@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "compile": "node-gyp rebuild",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "prepare": "npm run build",
     "example": "ts-node -r tsconfig-paths/register example/index.ts"
   },
