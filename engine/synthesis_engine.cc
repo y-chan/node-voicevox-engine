@@ -274,7 +274,7 @@ Napi::Buffer<uint8_t> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi
     wave_buffer.push_back(0x49); // I
     wave_buffer.push_back(0x46); // F
     wave_buffer.push_back(0x46); // F
-    int bytes_size = wave.size() * 8;
+    int bytes_size = wave.size() * num_channels * 8;
     int wave_size = bytes_size + 44 - 8;
     for (int i = 0; i < 4; i++) {
         wave_buffer.push_back((uint8_t)(wave_size & 0xff)); // chunk size
