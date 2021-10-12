@@ -40,7 +40,7 @@ public:
     Napi::Array replace_phoneme_length(Napi::Array accent_phrases, long speaker_id);
     Napi::Array replace_mora_pitch(Napi::Array accent_phrases, long speaker_id);
     Napi::Array synthesis_array(Napi::Env env, Napi::Object query, long speaker_id);
-    Napi::Buffer<uint8_t> synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id);
+    Napi::Buffer<char> synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id);
 private:
     Core *m_core;
 

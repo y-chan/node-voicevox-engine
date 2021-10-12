@@ -1,5 +1,5 @@
 #include <iterator>
-#include <iostream>
+#include <sstream>
 
 #include "synthesis_engine.h"
 
@@ -255,83 +255,88 @@ Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, 
     return converted_wave;
 }
 
-Napi::Buffer<uint8_t> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id) {
+Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id) {
     std::vector<float> wave = synthesis(query, speaker_id);
 
     // TODO: resampling
     float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
     bool output_stereo = query.Get("outputStereo").As<Napi::Boolean>().Value();
 
-    uint8_t num_channels = output_stereo ? 2 : 1;
-    uint8_t bit_depth = 16;
+    char num_channels = output_stereo ? 2 : 1;
+    char bit_depth = 16;
     int block_size = bit_depth * num_channels / 8;
 
-    std::vector<uint8_t> wave_buffer;
-    wave_buffer.push_back(0x52); // R
-    wave_buffer.push_back(0x49); // I
-    wave_buffer.push_back(0x46); // F
-    wave_buffer.push_back(0x46); // F
+    std::stringstream ss;
+    ss.write("RIFF", 4);
     int bytes_size = wave.size() * num_channels * 8;
     int wave_size = bytes_size + 44 - 8;
     for (int i = 0; i < 4; i++) {
-        wave_buffer.push_back((uint8_t)(wave_size & 0xff)); // chunk size
+        ss.put((uint8_t)(wave_size & 0xff)); // chunk size
         wave_size >>= 8;
     }
-    wave_buffer.push_back(0x57); // W
-    wave_buffer.push_back(0x41); // A
-    wave_buffer.push_back(0x56); // V
-    wave_buffer.push_back(0x45); // E
-    wave_buffer.push_back(0x66); // f
-    wave_buffer.push_back(0x6d); // m
-    wave_buffer.push_back(0x74); // t
-    wave_buffer.push_back(0x20);
+    ss.write("WAVEfmt ", 8);
 
-    wave_buffer.push_back(16); // fmt header length
-    for (int i = 0; i < 3; i++) wave_buffer.push_back(0); // fmt header length
-    wave_buffer.push_back(1); // linear PCM
-    wave_buffer.push_back(0); // linear PCM
-    wave_buffer.push_back(num_channels); // channnel
-    wave_buffer.push_back(0); // channnel
+    ss.put((char)16); // fmt header length
+    for (int i = 0; i < 3; i++) ss.put((uint8_t)0); // fmt header length
+    ss.put(1); // linear PCM
+    ss.put(0); // linear PCM
+    ss.put(num_channels); // channnel
+    ss.put(0); // channnel
 
     int sampling_rate = default_sampling_rate;
     for (int i = 0; i < 4; i++) {
-        wave_buffer.push_back((uint8_t)(sampling_rate & 0xff));
+        ss.put((char)(sampling_rate & 0xff));
         sampling_rate >>= 8;
     }
     int block_rate = default_sampling_rate * block_size;
     for (int i = 0; i < 4; i++) {
-        wave_buffer.push_back((uint8_t)(block_rate & 0xff));
+        ss.put((char)(block_rate & 0xff));
         block_rate >>= 8;
     }
 
-    wave_buffer.push_back(block_size);
-    wave_buffer.push_back(0);
-    wave_buffer.push_back(bit_depth);
-    wave_buffer.push_back(0);
+    ss.put(block_size);
+    ss.put(0);
+    ss.put(bit_depth);
+    ss.put(0);
 
-    wave_buffer.push_back(0x64); // d
-    wave_buffer.push_back(0x61); // a
-    wave_buffer.push_back(0x74); // t
-    wave_buffer.push_back(0x61); // a
-
+    ss.write("data", 4);
+    size_t data_p = ss.tellp();
     for (int i = 0; i < 4; i++) {
-        wave_buffer.push_back((uint8_t)(bytes_size & 0xff));
+        ss.put((char)(bytes_size & 0xff));
         block_rate >>= 8;
     }
 
     // workaround of Hiroshiba/voicevox_engine#128
     for (size_t i = (size_t)((float)default_sampling_rate * pre_padding_length); i < wave.size(); i++) {
         float v = wave[i] * volume_scale;
-        int16_t data = (int16_t)(std::min(1.0f, std::max(v, -1.0f)) * (float)0x7FFF);
-        wave_buffer.push_back((uint8_t)(data & 0xff));
-        wave_buffer.push_back((uint8_t)((data & 0xff00) >> 8));
+        int16_t data = (int16_t)(std::min(1.0f, std::max(v, -1.0f)) * (float)0x7fff);
+        ss.put((char)(data & 0xff));
+        ss.put((char)((data & 0xff00) >> 8));
         if (output_stereo) {
-            wave_buffer.push_back((uint8_t)(data & 0xff));
-            wave_buffer.push_back((uint8_t)((data & 0xff00) >> 8));
+            ss.put((char)(data & 0xff));
+            ss.put((char)((data & 0xff00) >> 8));
         }
     }
 
-    return Napi::Buffer<uint8_t>::Copy(env, wave_buffer.data(), wave_buffer.size());
+    size_t last_p = ss.tellp();
+    last_p -= 8;
+    ss.seekp(4);
+    for (int i = 0; i < 4; i++) {
+        ss.put((char)(last_p & 0xff));
+        last_p >>= 8;
+    }
+    ss.seekp(data_p);
+    size_t pointer = last_p - data_p - 4;
+    for (int i = 0; i < 4; i++) {
+        ss.put((char)(pointer & 0xff));
+        pointer >>= 8;
+    }
+
+    ss.seekg(0, std::ios::end);
+    int size = (int)ss.tellg();
+    ss.seekg(0, std::ios::beg);
+
+    return Napi::Buffer<char>::Copy(env, ss.str().c_str(), size);
 }
 
 std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_id) {
