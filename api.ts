@@ -257,7 +257,6 @@ server.post<QueryString<MoraApiQuery>>(
         request.query.speaker
       )
       void reply.type('application/json').code(200)
-      // void reply.type('audio/wav').code(200)
       return result
     } catch (e) {
       void reply.type('application/json').code(400)
