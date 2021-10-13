@@ -12,7 +12,8 @@
     "compile": "node-gyp rebuild",
     "build": "tsc -p tsconfig.build.json",
     "prepare": "npm run build",
-    "example": "ts-node -r tsconfig-paths/register example/index.ts"
+    "example": "ts-node -r tsconfig-paths/register example/index.ts",
+    "start": "ts-node -r tsconfig-paths/register api.ts"
   },
   "keywords": [
     "VOICEVOX",
@@ -33,6 +34,8 @@
     "@types/node-fetch": "^2.5.12",
     "@types/tar": "^4.0.5",
     "bindings": "^1.5.0",
+    "fastify": "^3.22.0",
+    "fastify-swagger": "^4.12.4",
     "node-addon-api": "^4.1.0",
     "node-fetch": "^2.6.5",
     "tar": "^6.1.11",
