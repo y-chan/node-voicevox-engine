@@ -28,14 +28,30 @@ Windows上で動かすとSegmentation Faultなどの問題を起こし、正し�
 ## ドキュメント
 準備中(現状はコード内に含まれるJSDocをご利用ください)
 
-## 使用例
-[example](example/index.ts)をご覧ください。
-なお、実行する際は`core.dll`となっている部分をフルパスに変更し、以下のようなコマンドをご利用ください。
-(libtorchの存在する場所によってパスを適切に変更してください。)
+## 音声合成エンジンとしての利用
+本ライブラリはVOICEVOXの音声合成エンジンとして利用可能です。
+[api](api.ts)内の`core.dll`となっている部分をフルパスに変更し、以下のようなコマンドをご利用ください。
+なお、音声ライブラリファイル群が`core.dll`/`libcore.so`と同じディレクトリ階層にある前提です。
 ```bash
-# ビルドとOpenJTalk辞書のダウンロード
+# ビルドと依存関係・OpenJTalk辞書のダウンロード
+# npm なら npm install
 yarn inatall
-# 実行
+# 実行する、npm なら npm start
+# libtorchの存在する場所によってパスを適切に変更してください
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/libtorch/lib/" yarn start
+```
+
+
+## ライブラリとしての使用例
+[example](example/index.ts)をご覧ください。
+なお、実行する際は[example](example/index.ts)内の`core.dll`となっている部分をフルパスに変更し、以下のようなコマンドをご利用ください。
+なお、音声ライブラリファイル群が`core.dll`/`libcore.so`と同じディレクトリ階層にある前提です。
+```bash
+# ビルドと依存関係・OpenJTalk辞書のダウンロード
+# npm なら npm install
+yarn inatall
+# 実行する、npm なら npm run example
+# libtorchの存在する場所によってパスを適切に変更してください
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/libtorch/lib/" yarn example
 ```
 
