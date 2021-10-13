@@ -42,17 +42,16 @@ interface AccentPhrasesApiQuery {
 }
 
 interface MoraApiQuery {
-  accent_phrases: AccentPhrase[]
   speaker: number
 }
 
 interface SynthesisApiQuery {
-  audio_query: AudioQuery
   speaker: number
 }
 
-interface QueryString<Q> {
+interface RequestContent<Q, B = unknown> {
   Querystring: Q
+  Body: B
 }
 
 const MoraSchema = {
@@ -142,11 +141,11 @@ const AccentPhrasesApiSchema: FastifySchema = {
 }
 
 const MoraApiSchema: FastifySchema = {
+  body: AccentPhrasesSchema,
   querystring: {
     type: 'object',
-    required: ['accent_phrases', 'speaker'],
+    required: ['speaker'],
     properties: {
-      accent_phrases: AccentPhrasesSchema,
       speaker: { type: 'number' },
     },
   },
@@ -156,17 +155,17 @@ const MoraApiSchema: FastifySchema = {
 }
 
 const SynthesisApiSchema: FastifySchema = {
+  body: AudioQuerySchema,
   querystring: {
     type: 'object',
-    required: ['audio_query', 'speaker'],
+    required: ['speaker'],
     properties: {
-      audio_query: AudioQuerySchema,
       speaker: { type: 'number' },
     },
   },
 }
 
-server.post<QueryString<AudioQueryApiQuery>>(
+server.post<RequestContent<AudioQueryApiQuery>>(
   '/audio_query',
   {
     schema: AudioQueryApiSchema,
@@ -186,7 +185,7 @@ server.post<QueryString<AudioQueryApiQuery>>(
   }
 )
 
-server.post<QueryString<AccentPhrasesApiQuery>>(
+server.post<RequestContent<AccentPhrasesApiQuery>>(
   '/accent_phrases',
   { schema: AccentPhrasesApiSchema },
   async (request, reply) => {
@@ -205,17 +204,14 @@ server.post<QueryString<AccentPhrasesApiQuery>>(
   }
 )
 
-server.post<QueryString<MoraApiQuery>>(
+server.post<RequestContent<MoraApiQuery, AccentPhrase[]>>(
   '/mora_data',
   {
     schema: MoraApiSchema,
   },
   async (request, reply) => {
     try {
-      const result = engine.mora_data(
-        request.query.accent_phrases,
-        request.query.speaker
-      )
+      const result = engine.mora_data(request.body, request.query.speaker)
       void reply.type('application/json').code(200)
       return result
     } catch (e) {
@@ -225,7 +221,7 @@ server.post<QueryString<MoraApiQuery>>(
   }
 )
 
-server.post<QueryString<MoraApiQuery>>(
+server.post<RequestContent<MoraApiQuery, AccentPhrase[]>>(
   '/mora_length',
   {
     schema: MoraApiSchema,
@@ -233,7 +229,7 @@ server.post<QueryString<MoraApiQuery>>(
   async (request, reply) => {
     try {
       const result = engine.mora_length(
-        request.query.accent_phrases,
+        request.body,
         request.query.speaker
       )
       void reply.type('application/json').code(200)
@@ -245,17 +241,14 @@ server.post<QueryString<MoraApiQuery>>(
   }
 )
 
-server.post<QueryString<MoraApiQuery>>(
+server.post<RequestContent<MoraApiQuery, AccentPhrase[]>>(
   '/mora_pitch',
   {
     schema: MoraApiSchema,
   },
   async (request, reply) => {
     try {
-      const result = engine.mora_pitch(
-        request.query.accent_phrases,
-        request.query.speaker
-      )
+      const result = engine.mora_pitch(request.body, request.query.speaker)
       void reply.type('application/json').code(200)
       return result
     } catch (e) {
@@ -274,7 +267,7 @@ server.get('/speakers', async (request, reply) => {
   return engine.metas()
 })
 
-server.post<QueryString<SynthesisApiQuery>>(
+server.post<RequestContent<SynthesisApiQuery, AudioQuery>>(
   '/synthesis',
   {
     schema: SynthesisApiSchema,
@@ -282,7 +275,7 @@ server.post<QueryString<SynthesisApiQuery>>(
   async (request, reply) => {
     try {
       const result = engine.synthesis(
-        request.query.audio_query,
+        request.body,
         request.query.speaker
       )
       void reply.type('audio/wav').code(200)
