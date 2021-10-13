@@ -1,7 +1,8 @@
 {
-  "name": "node-voicevox-core",
-  "version": "1.0.0",
+  "name": "node-voicevox-engine",
+  "version": "0.1.0",
   "main": "index.js",
+  "types": "index.d.ts",
   "license": "LGPL-3.0",
   "scripts": {
     "preinstall": "node script/check-mac.js",
@@ -19,13 +20,13 @@
   ],
   "author": "y-chan <y-chan@y-chan.dev>",
   "gypfile": true,
-  "homepage": "https://github.com/y-chan/node-voicevox-core#readme",
+  "homepage": "https://github.com/y-chan/node-voicevox-engine#readme",
   "bugs": {
-    "url": "https://github.com/y-chan/node-voicevox-core/issues"
+    "url": "https://github.com/y-chan/node-voicevox-engine/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/y-chan/node-voicevox-core"
+    "url": "https://github.com/y-chan/node-voicevox-engine"
   },
   "dependencies": {
     "@types/node": "^16.9.1",
