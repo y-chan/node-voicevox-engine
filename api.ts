@@ -32,23 +32,23 @@ console.log('loading core was succeed')
 
 interface AudioQueryApiQuery {
   text: string
-  speaker_id: number
+  speaker: number
 }
 
 interface AccentPhrasesApiQuery {
   text: string
-  speaker_id: number
+  speaker: number
   is_kana?: boolean
 }
 
 interface MoraApiQuery {
   accent_phrases: AccentPhrase[]
-  speaker_id: number
+  speaker: number
 }
 
 interface SynthesisApiQuery {
   audio_query: AudioQuery
-  speaker_id: number
+  speaker: number
 }
 
 interface QueryString<Q> {
@@ -115,10 +115,10 @@ const AudioQuerySchema = {
 const AudioQueryApiSchema: FastifySchema = {
   querystring: {
     type: 'object',
-    required: ['text', 'speaker_id'],
+    required: ['text', 'speaker'],
     properties: {
       text: { type: 'string' },
-      speaker_id: { type: 'number' },
+      speaker: { type: 'number' },
     },
   },
   response: {
@@ -129,10 +129,10 @@ const AudioQueryApiSchema: FastifySchema = {
 const AccentPhrasesApiSchema: FastifySchema = {
   querystring: {
     type: 'object',
-    required: ['text', 'speaker_id'],
+    required: ['text', 'speaker'],
     properties: {
       text: { type: 'string' },
-      speaker_id: { type: 'number' },
+      speaker: { type: 'number' },
       is_kana: { type: 'boolean' },
     },
   },
@@ -144,10 +144,10 @@ const AccentPhrasesApiSchema: FastifySchema = {
 const MoraApiSchema: FastifySchema = {
   querystring: {
     type: 'object',
-    required: ['accent_phrases', 'speaker_id'],
+    required: ['accent_phrases', 'speaker'],
     properties: {
       accent_phrases: AccentPhrasesSchema,
-      speaker_id: { type: 'number' },
+      speaker: { type: 'number' },
     },
   },
   response: {
@@ -158,10 +158,10 @@ const MoraApiSchema: FastifySchema = {
 const SynthesisApiSchema: FastifySchema = {
   querystring: {
     type: 'object',
-    required: ['audio_query', 'speaker_id'],
+    required: ['audio_query', 'speaker'],
     properties: {
       audio_query: AudioQuerySchema,
-      speaker_id: { type: 'number' },
+      speaker: { type: 'number' },
     },
   },
 }
@@ -175,7 +175,7 @@ server.post<QueryString<AudioQueryApiQuery>>(
     try {
       const result = engine.audio_query(
         request.query.text,
-        request.query.speaker_id
+        request.query.speaker
       )
       void reply.type('application/json').code(200)
       return result
@@ -193,7 +193,7 @@ server.post<QueryString<AccentPhrasesApiQuery>>(
     try {
       const result = engine.accent_phrases(
         request.query.text,
-        request.query.speaker_id,
+        request.query.speaker,
         request.query.is_kana
       )
       void reply.type('application/json').code(200)
@@ -214,7 +214,7 @@ server.post<QueryString<MoraApiQuery>>(
     try {
       const result = engine.mora_data(
         request.query.accent_phrases,
-        request.query.speaker_id
+        request.query.speaker
       )
       void reply.type('application/json').code(200)
       return result
@@ -234,7 +234,7 @@ server.post<QueryString<MoraApiQuery>>(
     try {
       const result = engine.mora_length(
         request.query.accent_phrases,
-        request.query.speaker_id
+        request.query.speaker
       )
       void reply.type('application/json').code(200)
       return result
@@ -254,7 +254,7 @@ server.post<QueryString<MoraApiQuery>>(
     try {
       const result = engine.mora_pitch(
         request.query.accent_phrases,
-        request.query.speaker_id
+        request.query.speaker
       )
       void reply.type('application/json').code(200)
       // void reply.type('audio/wav').code(200)
@@ -284,7 +284,7 @@ server.post<QueryString<SynthesisApiQuery>>(
     try {
       const result = engine.synthesis(
         request.query.audio_query,
-        request.query.speaker_id
+        request.query.speaker
       )
       void reply.type('audio/wav').code(200)
       return result
