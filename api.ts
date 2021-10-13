@@ -1,4 +1,5 @@
 import fastify, { FastifySchema } from 'fastify'
+import fastifyCors from 'fastify-cors'
 import fastifySwagger from 'fastify-swagger'
 
 import Engine, { AccentPhrase, AudioQuery } from '@/index'
@@ -17,6 +18,12 @@ void server.register(fastifySwagger, {
     },
   },
   exposeRoute: true,
+})
+void server.register(fastifyCors, {
+  origin: '*',
+  credentials: true,
+  methods: '*',
+  allowedHeaders: '*',
 })
 
 const PORT = process.env.PORT || 50021
