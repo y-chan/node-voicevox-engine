@@ -1,7 +1,7 @@
 #include "acoustic_feature_extractor.h"
 
-long OjtPhoneme::phoneme_id() {
-    return (long)phoneme_map().at(phoneme);
+int64_t OjtPhoneme::phoneme_id() {
+    return (int64_t)phoneme_map().at(phoneme);
 }
 
 std::vector<OjtPhoneme> OjtPhoneme::convert(std::vector<OjtPhoneme> phonemes) {

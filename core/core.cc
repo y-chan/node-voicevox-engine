@@ -39,7 +39,7 @@ const char *Core::metas()
 	return metas();
 }
 
-bool Core::yukarin_s_forward(int length, long *phoneme_list, long *speaker_id, float *output)
+bool Core::yukarin_s_forward(int length, int64_t *phoneme_list, int64_t *speaker_id, float *output)
 {
 	YUKARIN_S yukarin = (YUKARIN_S)GetProcAddress(m_handler, "yukarin_s_forward");
 	return yukarin(length, phoneme_list, speaker_id, output);
@@ -47,13 +47,13 @@ bool Core::yukarin_s_forward(int length, long *phoneme_list, long *speaker_id, f
 
 bool Core::yukarin_sa_forward(
     int length,
-    long* vowel_phoneme_list,
-    long* consonant_phoneme_list,
-    long* start_accent_list,
-    long* end_accent_list,
-    long* start_accent_phrase_list,
-    long* end_accent_phrase_list,
-    long* speaker_id,
+    int64_t *vowel_phoneme_list,
+    int64_t *consonant_phoneme_list,
+    int64_t *start_accent_list,
+    int64_t *end_accent_list,
+    int64_t *start_accent_phrase_list,
+    int64_t *end_accent_phrase_list,
+    int64_t *speaker_id,
     float* output
 )
 {
@@ -76,7 +76,7 @@ bool Core::decode_forward(
     int phoneme_size,
     float *f0,
     float *phoneme,
-    long *speaker_id,
+    int64_t *speaker_id,
     float *output
 )
 {

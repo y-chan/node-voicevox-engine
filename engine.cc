@@ -375,14 +375,14 @@ Napi::Value EngineWrapper::yukarin_s_forward(const Napi::CallbackInfo& info)
 
     int length = (int)info[0].As<Napi::Array>().Length();
 
-    std::vector<long> phoneme_list(length);
+    std::vector<int64_t> phoneme_list(length);
     for (int i = 0; i < length; i++) {
         Napi::Value val = info[0].As<Napi::Array>()[i];
         phoneme_list[i] = (long)val.As<Napi::Number>().Int64Value();
         std::cout << phoneme_list[i] << std::endl;
     }
 
-    long speaker_id = info[1].As<Napi::Number>().Int64Value();
+    int64_t speaker_id = info[1].As<Napi::Number>().Int64Value();
 
     std::vector<float> output(length, 0);
 
@@ -417,34 +417,34 @@ Napi::Value EngineWrapper::yukarin_sa_forward(const Napi::CallbackInfo& info)
     }
 
     int length = info[0].As<Napi::Array>().Length();
-    std::vector<long> vowel_phoneme_list(length);
-    std::vector<long> consonant_phoneme_list(length);
-    std::vector<long> start_accent_list(length);
-    std::vector<long> end_accent_list(length);
-    std::vector<long> start_accent_phrase_list(length);
-    std::vector<long> end_accent_phrase_list(length);
+    std::vector<int64_t> vowel_phoneme_list(length);
+    std::vector<int64_t> consonant_phoneme_list(length);
+    std::vector<int64_t> start_accent_list(length);
+    std::vector<int64_t> end_accent_list(length);
+    std::vector<int64_t> start_accent_phrase_list(length);
+    std::vector<int64_t> end_accent_phrase_list(length);
 
     for (int i = 0; i < length; i++) {
         Napi::Value val0 = info[0].As<Napi::Array>()[i];
-        vowel_phoneme_list[i] = val0.As<Napi::Number>().Int32Value();
+        vowel_phoneme_list[i] = val0.As<Napi::Number>().Int64Value();
 
         Napi::Value val1 = info[1].As<Napi::Array>()[i];
-        consonant_phoneme_list[i] = val1.As<Napi::Number>().Int32Value();
+        consonant_phoneme_list[i] = val1.As<Napi::Number>().Int64Value();
 
         Napi::Value val2 = info[2].As<Napi::Array>()[i];
-        start_accent_list[i] = val2.As<Napi::Number>().Int32Value();
+        start_accent_list[i] = val2.As<Napi::Number>().Int64Value();
 
         Napi::Value val3 = info[3].As<Napi::Array>()[i];
-        end_accent_list[i] = val3.As<Napi::Number>().Int32Value();
+        end_accent_list[i] = val3.As<Napi::Number>().Int64Value();
 
         Napi::Value val4 = info[4].As<Napi::Array>()[i];
-        start_accent_phrase_list[i] = val4.As<Napi::Number>().Int32Value();
+        start_accent_phrase_list[i] = val4.As<Napi::Number>().Int64Value();
 
         Napi::Value val5 = info[5].As<Napi::Array>()[i];
-        end_accent_phrase_list[i] = val5.As<Napi::Number>().Int32Value();
+        end_accent_phrase_list[i] = val5.As<Napi::Number>().Int64Value();
     }
 
-    long speaker_id = info[6].As<Napi::Number>().Int64Value();
+    int64_t speaker_id = info[6].As<Napi::Number>().Int64Value();
 
     std::vector<float> output(length, 0);
 

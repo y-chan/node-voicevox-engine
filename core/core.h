@@ -18,16 +18,16 @@ typedef void* FARPROC;
 
 typedef bool (*INIT)(char *root_dir_path, bool use_gpu);
 typedef const char *(*RETURN_CHAR)();
-typedef bool (*YUKARIN_S)(int length, long *phoneme_list, long *speaker_id, float *output);
+typedef bool (*YUKARIN_S)(int length, int64_t *phoneme_list, int64_t *speaker_id, float *output);
 typedef bool (*YUKARIN_SA)(
     int length,
-    long *vowel_phoneme_list,
-    long *consonant_phoneme_list,
-    long *start_accent_list,
-    long *end_accent_list,
-    long *start_accent_phrase_list,
-    long *end_accent_phrase_list,
-    long *speaker_id,
+    int64_t *vowel_phoneme_list,
+    int64_t *consonant_phoneme_list,
+    int64_t *start_accent_list,
+    int64_t *end_accent_list,
+    int64_t *start_accent_phrase_list,
+    int64_t *end_accent_phrase_list,
+    int64_t *speaker_id,
     float *output
 );
 typedef bool (*DECODE)(
@@ -35,7 +35,7 @@ typedef bool (*DECODE)(
     int phoneme_size,
     float *f0,
     float *phoneme,
-    long *speaker_id,
+    int64_t *speaker_id,
     float *output
 );
 
@@ -47,17 +47,17 @@ public:
 
     const char *metas();
 
-    bool yukarin_s_forward(int length, long *phoneme_list, long *speaker_id, float *output);
+    bool yukarin_s_forward(int length, int64_t *phoneme_list, int64_t *speaker_id, float *output);
 
     bool yukarin_sa_forward(
         int length,
-        long *vowel_phoneme_list,
-        long *consonant_phoneme_list,
-        long *start_accent_list,
-        long *end_accent_list,
-        long *start_accent_phrase_list,
-        long *end_accent_phrase_list,
-        long *speaker_id,
+        int64_t *vowel_phoneme_list,
+        int64_t *consonant_phoneme_list,
+        int64_t *start_accent_list,
+        int64_t *end_accent_list,
+        int64_t *start_accent_phrase_list,
+        int64_t *end_accent_phrase_list,
+        int64_t *speaker_id,
         float *output
     );
 
@@ -66,7 +66,7 @@ public:
         int phoneme_size,
         float *f0,
         float *phoneme,
-        long *speaker_id,
+        int64_t *speaker_id,
         float *output
     );
 

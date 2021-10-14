@@ -68,7 +68,7 @@ public:
         end = c_end;
     }
 
-    long phoneme_id();
+    int64_t phoneme_id();
     static std::vector<OjtPhoneme> convert(std::vector<OjtPhoneme> phonemes);
 };
 

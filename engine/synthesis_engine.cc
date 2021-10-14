@@ -1,4 +1,5 @@
 #include <iterator>
+#include <iostream>
 #include <sstream>
 
 #include "synthesis_engine.h"
@@ -36,7 +37,7 @@ void split_mora(
     std::vector<OjtPhoneme> phoneme_list,
     std::vector<OjtPhoneme *> &consonant_phoneme_list,
     std::vector<OjtPhoneme> &vowel_phoneme_list,
-    std::vector<long> &vowel_indexes
+    std::vector<int64_t> &vowel_indexes
 ) {
     for (size_t i = 0; i < phoneme_list.size(); i++) {
         std::vector<std::string>::iterator result = std::find(
@@ -45,10 +46,10 @@ void split_mora(
             phoneme_list[i].phoneme
         );
         if (result != mora_phoneme_list.end()) {
-            vowel_indexes.push_back((long)i);
+            vowel_indexes.push_back((int64_t)i);
         }
     }
-    for (int index : vowel_indexes) {
+    for (int64_t index : vowel_indexes) {
         vowel_phoneme_list.push_back(phoneme_list[index]);
     }
     consonant_phoneme_list.push_back(nullptr);
@@ -65,7 +66,7 @@ void split_mora(
 }
 
 
-Napi::Array SynthesisEngine::replace_mora_data(Napi::Array accent_phrases, long speaker_id) {
+Napi::Array SynthesisEngine::replace_mora_data(Napi::Array accent_phrases, int64_t speaker_id) {
     return replace_mora_pitch(
         replace_phoneme_length(
             accent_phrases,
@@ -75,7 +76,7 @@ Napi::Array SynthesisEngine::replace_mora_data(Napi::Array accent_phrases, long 
     );
 }
 
-Napi::Array SynthesisEngine::replace_phoneme_length(Napi::Array accent_phrases, long speaker_id) {
+Napi::Array SynthesisEngine::replace_phoneme_length(Napi::Array accent_phrases, int64_t speaker_id) {
     std::vector<Napi::Object> flatten_moras;
     std::vector<std::string> phoneme_str_list;
     std::vector<OjtPhoneme> phoneme_data_list;
@@ -83,13 +84,14 @@ Napi::Array SynthesisEngine::replace_phoneme_length(Napi::Array accent_phrases, 
 
     std::vector<OjtPhoneme *> consonant_phoneme_list;
     std::vector<OjtPhoneme> vowel_phoneme_list;
-    std::vector<long> vowel_indexes_data;
+    std::vector<int64_t> vowel_indexes_data;
     split_mora(phoneme_data_list, consonant_phoneme_list, vowel_phoneme_list, vowel_indexes_data);
 
-    std::vector<long> phoneme_list_s;
+    std::vector<int64_t> phoneme_list_s;
     for (OjtPhoneme phoneme_data : phoneme_data_list) phoneme_list_s.push_back(phoneme_data.phoneme_id());
     std::vector<float> phoneme_length(phoneme_list_s.size(), 0.0);
     bool success = m_core->yukarin_s_forward(phoneme_list_s.size(), phoneme_list_s.data(), &speaker_id, phoneme_length.data());
+    std::cout << "yukarin_s" << std::endl;
 
     if (!success) {
         throw std::runtime_error(m_core->last_error_message());
@@ -121,16 +123,16 @@ Napi::Array SynthesisEngine::replace_phoneme_length(Napi::Array accent_phrases, 
     return accent_phrases;
 }
 
-Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long speaker_id) {
+Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, int64_t speaker_id) {
     std::vector<Napi::Object> flatten_moras;
     std::vector<std::string> phoneme_str_list;
     std::vector<OjtPhoneme> phoneme_data_list;
     initail_process(accent_phrases, flatten_moras, phoneme_str_list, phoneme_data_list);
 
-    std::vector<long> base_start_accent_list;
-    std::vector<long> base_end_accent_list;
-    std::vector<long> base_start_accent_phrase_list;
-    std::vector<long> base_end_accent_phrase_list;
+    std::vector<int64_t> base_start_accent_list;
+    std::vector<int64_t> base_end_accent_list;
+    std::vector<int64_t> base_start_accent_phrase_list;
+    std::vector<int64_t> base_end_accent_phrase_list;
 
     for (uint32_t i = 0; i < accent_phrases.Length(); i++) {
         base_start_accent_list.push_back(0);
@@ -156,10 +158,10 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
 
     std::vector<OjtPhoneme *> consonant_phoneme_data_list;
     std::vector<OjtPhoneme> vowel_phoneme_data_list;
-    std::vector<long> vowel_indexes;
+    std::vector<int64_t> vowel_indexes;
     split_mora(phoneme_data_list, consonant_phoneme_data_list, vowel_phoneme_data_list, vowel_indexes);
 
-    std::vector<long> consonant_phoneme_list;
+    std::vector<int64_t> consonant_phoneme_list;
     for (OjtPhoneme* consonant_phoneme_data : consonant_phoneme_data_list) {
         long phoneme_id = consonant_phoneme_data != nullptr
             ? consonant_phoneme_data->phoneme_id()
@@ -167,15 +169,15 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
         consonant_phoneme_list.push_back(phoneme_id);
     }
 
-    std::vector<long> vowel_phoneme_list;
+    std::vector<int64_t> vowel_phoneme_list;
     for (OjtPhoneme vowel_phoneme_data : vowel_phoneme_data_list) {
         vowel_phoneme_list.push_back(vowel_phoneme_data.phoneme_id());
     }
 
-    std::vector<long> start_accent_list;
-    std::vector<long> end_accent_list;
-    std::vector<long> start_accent_phrase_list;
-    std::vector<long> end_accent_phrase_list;
+    std::vector<int64_t> start_accent_list;
+    std::vector<int64_t> end_accent_list;
+    std::vector<int64_t> start_accent_phrase_list;
+    std::vector<int64_t> end_accent_phrase_list;
 
     for (long vowel_index : vowel_indexes) {
         start_accent_list.push_back(base_start_accent_list[vowel_index]);
@@ -236,7 +238,7 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
     return accent_phrases;
 }
 
-Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, long speaker_id) {
+Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, int64_t speaker_id) {
     std::vector<float> wave = synthesis(query, speaker_id);
 
     // TODO: resampling
@@ -255,7 +257,7 @@ Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, 
     return converted_wave;
 }
 
-Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id) {
+Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::Object query, int64_t speaker_id) {
     std::vector<float> wave = synthesis(query, speaker_id);
 
     // TODO: resampling
@@ -339,7 +341,7 @@ Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::O
     return Napi::Buffer<char>::Copy(env, ss.str().c_str(), size);
 }
 
-std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_id) {
+std::vector<float> SynthesisEngine::synthesis(Napi::Object query, int64_t speaker_id) {
     float rate = 200;
 
     Napi::Array accent_phrases = query.Get("accent_phrases").As<Napi::Array>();
@@ -393,7 +395,7 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
 
     std::vector<OjtPhoneme *> consonant_phoneme_data_list;
     std::vector<OjtPhoneme> vowel_phoneme_data_list;
-    std::vector<long> vowel_indexes;
+    std::vector<int64_t> vowel_indexes;
     split_mora(phoneme_data_list, consonant_phoneme_data_list, vowel_phoneme_data_list, vowel_indexes);
 
     // workaround of Hiroshiba/voicevox_engine#128
@@ -403,10 +405,10 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
     std::vector<float> f0;
     int phoneme_length_sum = 0;
     int f0_count = 0;
-    long *p_vowel_index = vowel_indexes.data();
+    int64_t *p_vowel_index = vowel_indexes.data();
     for (size_t i = 0; i < phoneme_length_list.size(); i++) {
         int phoneme_length = (int)std::round((std::round(phoneme_length_list[i] * rate) / speed_scale));
-        long phoneme_id = phoneme_data_list[i].phoneme_id();
+        int64_t phoneme_id = phoneme_data_list[i].phoneme_id();
         for (int j = 0; j < phoneme_length; j++) {
             std::vector<float> phonemes_vector(OjtPhoneme::num_phoneme(), 0.0);
             phonemes_vector[phoneme_id] = 1;
@@ -414,7 +416,7 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
         }
         phoneme_length_sum += phoneme_length;
         if (i == *p_vowel_index) {
-            for (long k = 0; k < phoneme_length_sum; k++) {
+            for (int k = 0; k < phoneme_length_sum; k++) {
                 f0.push_back(f0_list[f0_count]);
             }
             f0_count++;
@@ -462,7 +464,7 @@ void SynthesisEngine::initail_process(
     phoneme_data_list = to_phoneme_data_list(phoneme_str_list);
 }
 
-void SynthesisEngine::create_one_accent_list(std::vector<long> &accent_list, Napi::Object accent_phrase, int point) {
+void SynthesisEngine::create_one_accent_list(std::vector<int64_t> &accent_list, Napi::Object accent_phrase, int point) {
     Napi::Array moras = accent_phrase.Get("moras").As<Napi::Array>();
 
     std::vector<long> one_accent_list;
