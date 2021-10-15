@@ -62,13 +62,13 @@ interface IEngine {
 }
 
 /**
- * Coreの関数をまとめてラップしたクラス
+ * CoreとEngineの関数をまとめてラップしたクラス
  */
 class Engine implements IEngine {
   private readonly addon: IEngine
 
   /**
-   * Coreクラスの初期化
+   * Engineクラスの初期化
    * Coreライブラリはライセンスの関係上、使用者自身で用意する必要があるため、
    * Coreライブラリのパス(ファイル名まで含む)を指定する。
    * また、音声ライブラリデータ群を別フォルダ内で保持している場合は、そのフォルダのパスを指定する。
