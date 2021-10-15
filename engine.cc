@@ -471,7 +471,7 @@ Napi::Value EngineWrapper::yukarin_sa_forward(const Napi::CallbackInfo& info)
     return output_array;
 }
 
-/*
+
 Napi::Value EngineWrapper::decode_forward(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
@@ -480,71 +480,62 @@ Napi::Value EngineWrapper::decode_forward(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
-    bool wrong_arg = false;
-    for (int i = 0; i < 3; i++) wrong_arg |= !info[i].IsArray();
-    if (wrong_arg) {
+    if (!info[0].IsArray() || !info[1].IsArray() || !info[2].IsNumber()) {
         Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
 
-    int length = info[1].As<Napi::Array>().Length();
+    Napi::Array f0_array = info[0].As<Napi::Array>();
+    Napi::Array phoneme_array = info[1].As<Napi::Array>();
 
-    int f0_length = info[0].As<Napi::Array>().Length();
-    float **f0 = (float**)malloc(sizeof(float *) * f0_length);
-    float *base_f0 = (float*)malloc(sizeof(float) * f0_length * length);
-    for (int i = 0; i < f0_length; i++) {
-        f0[i] = base_f0 + i * length;
-        Napi::Value val_array = info[0].As<Napi::Array>()[i];
-        for (int j = 0; j < length; j++) {
-            Napi::Value val = val_array.As<Napi::Array>()[j];
-            f0[i][j] = val.As<Napi::Number>().FloatValue();
-        }
+    if (!phoneme_array.IsArray()) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
     }
 
-    Napi::Value phoneme_item = info[1].As<Napi::Array>()[(uint32_t)0];
-    int phoneme_size = phoneme_item.As<Napi::Array>().Length();
-    float **phoneme = (float **)malloc(sizeof(float *) * length);
-    float *base_phoneme = (float*)malloc(sizeof(float) * length * phoneme_size);
+    Napi::Array phoneme_array_array = phoneme_array.Get(0).As<Napi::Array>();
+
+    if (!phoneme_array_array.Get(0).IsNumber()) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    int length = info[0].As<Napi::Array>().Length();
+    int phoneme_size = phoneme_array_array.Length();
+
+    std::vector<float> f0(length);
+    std::vector<float> phoneme(length * phoneme_size);
+
     for (int i = 0; i < length; i++) {
-        phoneme[i] = base_phoneme + i * length;
-        Napi::Value val_array = info[1].As<Napi::Array>()[i];
-        for (int j = 0; j < length; j++) {
-            Napi::Value val = val_array.As<Napi::Array>()[j];
-            phoneme[i][j] = val.As<Napi::Number>().FloatValue();
+        Napi::Value val1 = f0_array[i];
+        f0[i] = val1.As<Napi::Number>().FloatValue();
+
+        phoneme_array_array = phoneme_array.Get(i).As<Napi::Array>();
+        for (int j = 0; j < phoneme_size; j++) {
+            Napi::Value val2 = phoneme_array_array[j];
+            phoneme[i * length + j] = val2.As<Napi::Number>().FloatValue();
         }
     }
 
-    int speakers = info[2].As<Napi::Array>().Length();
-    long *speaker_id = (long *)malloc(sizeof(long) * speakers);
-    for (int i = 0; i < speakers; i++) {
-        Napi::Value val = info[2].As<Napi::Array>()[i];
-        speaker_id[i] = val.As<Napi::Number>().Int32Value();
-    }
+    long speaker_id = info[2].As<Napi::Number>().Int64Value();
 
-    float* output = (float*)calloc(length * 256, sizeof(float));
+    int output_size = length * 256;
+    std::vector<float> output(output_size, 0.0);
 
     if (!m_core->decode_forward(
-        length, phoneme_size, (float *)f0, (float *)phoneme, speaker_id, output
+        length, phoneme_size, f0.data(), phoneme.data(), &speaker_id, output.data()
     )) {
         create_execute_error(env, __func__);
         return env.Null();
     }
 
-    Napi::Array output_array = Napi::Array::New(env, length);
-    for (int i = 0; i < length; i++) {
+    Napi::Array output_array = Napi::Array::New(env, output_size);
+    for (int i = 0; i < output_size; i++) {
         output_array[i] = Napi::Number::New(env, output[i]);
     }
 
-    free(f0);
-    free(base_f0);
-    free(phoneme);
-    free(base_phoneme);
-    free(speaker_id);
-    free(output);
-
     return output_array;
 }
- */
 
 Napi::Object CreateObject(const Napi::CallbackInfo& info) {
     return EngineWrapper::NewInstance(info.Env(), info);

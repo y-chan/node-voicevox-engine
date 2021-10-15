@@ -54,11 +54,11 @@ interface IEngine {
     end_accent_phrase_list: number[],
     speaker_id: number
   ): number[]
-  /* decode_forward(
-    f0: number[][],
+  decode_forward(
+    f0: number[],
     phoneme: number[][],
-    speaker_id: number[]
-  ): number[] */
+    speaker_id: number
+  ): number[]
 }
 
 /**
@@ -218,18 +218,18 @@ class Engine implements IEngine {
 
   /**
    * フレームごとの音素と音高から、波形を求める
-   * @param {number[][]} f0 - フレームごとの音高
+   * @param {number[]} f0 - フレームごとの音高
    * @param {number[][]} phoneme - フレームごとの音素
-   * @param {number[]} speaker_id - 話者番号
+   * @param {number} speaker_id - 話者番号
    * @return {number[]} - 音声波形
    */
-  /* decode_forward(
-    f0: number[][],
+  decode_forward(
+    f0: number[],
     phoneme: number[][],
-    speaker_id: number[]
+    speaker_id: number
   ): number[] {
     return this.addon.decode_forward(f0, phoneme, speaker_id)
-  } */
+  }
 }
 
 export default Engine
