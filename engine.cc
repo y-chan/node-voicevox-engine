@@ -493,9 +493,12 @@ Napi::Value EngineWrapper::decode_forward(const Napi::CallbackInfo& info)
         return env.Null();
     }
 
-    Napi::Array phoneme_array_array = phoneme_array.Get(0).As<Napi::Array>();
+    Napi::Value phoneme_array_value = phoneme_array[(uint32_t)0];
+    Napi::Array phoneme_array_array = phoneme_array_value.As<Napi::Array>();
 
-    if (!phoneme_array_array.Get(0).IsNumber()) {
+    Napi::Value phoneme_value = phoneme_array_array[(uint32_t)0];
+
+    if (!phoneme_value.IsNumber()) {
         Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
@@ -510,7 +513,8 @@ Napi::Value EngineWrapper::decode_forward(const Napi::CallbackInfo& info)
         Napi::Value val1 = f0_array[i];
         f0[i] = val1.As<Napi::Number>().FloatValue();
 
-        phoneme_array_array = phoneme_array.Get(i).As<Napi::Array>();
+        phoneme_array_value = phoneme_array[i];
+        phoneme_array_array = phoneme_array_value.As<Napi::Array>();
         for (int j = 0; j < phoneme_size; j++) {
             Napi::Value val2 = phoneme_array_array[j];
             phoneme[i * length + j] = val2.As<Napi::Number>().FloatValue();
