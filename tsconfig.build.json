@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "exclude": [
     "example",
-    "script"
+    "script",
+    "api.ts"
   ]
 }
