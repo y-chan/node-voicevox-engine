@@ -1,7 +1,6 @@
-import fetch from 'node-fetch'
-import { stdout } from 'process'
-import { extract } from 'tar'
-import { createGunzip } from 'zlib'
+const fetch = require('node-fetch')
+const { extract } = require('tar')
+const { createGunzip } = require('zlib')
 
 const gunzip = createGunzip()
 const extractor = extract({ path: '../open_jtalk_dic_utf_8-1.11' })
@@ -20,9 +19,9 @@ void fetch(dict_url).then((res) => {
   if (binary === null) {
     throw Error('Failed download OpenJTalk Dictionary')
   }
-  const length = Number(res.headers.get('content-length')!)
+  const length = Number(res.headers.get('content-length'))
   let now_size = 0
-  binary.on('data', (data: Buffer) => {
+  binary.on('data', (data) => {
     now_size += data.length
     process.stdout.write(
       `${now_downloading} ${Math.floor((now_size * 100) / length)}%\r`

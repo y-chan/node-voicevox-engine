@@ -6,7 +6,7 @@
   "license": "LGPL-3.0",
   "scripts": {
     "preinstall": "node script/check-mac.js",
-    "postinstall": "ts-node script/download-dict.ts",
+    "postinstall": "node script/download-dict.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "compile": "node-gyp rebuild",
@@ -45,8 +45,6 @@
   ],
   "dependencies": {
     "@types/node": "^16.9.1",
-    "@types/node-fetch": "^2.5.12",
-    "@types/tar": "^4.0.5",
     "bindings": "^1.5.0",
     "fastify": "^3.22.0",
     "fastify-cors": "^6.0.2",
