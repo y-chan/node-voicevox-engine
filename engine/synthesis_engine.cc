@@ -239,18 +239,21 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
 Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, long speaker_id) {
     std::vector<float> wave = synthesis(query, speaker_id);
 
-    // TODO: resampling
     float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
     bool output_stereo = query.Get("outputStereo").As<Napi::Boolean>().Value();
+    // TODO: 44.1kHzなどの対応
+    int output_sampling_rate = query.Get("outputSamplingRate").As<Napi::Number>().Int32Value();
 
     int num_channels = output_stereo ? 2 : 1;
+    int repeat_count = (output_sampling_rate / default_sampling_rate) * num_channels;
 
-    Napi::Array converted_wave = Napi::Array::New(env, wave.size() * num_channels);
+    Napi::Array converted_wave = Napi::Array::New(env, wave.size() * repeat_count);
     // workaround of Hiroshiba/voicevox_engine#128
     for (size_t i = (size_t)((float)default_sampling_rate * pre_padding_length); i < wave.size(); i++) {
         size_t index = i - (size_t)((float)default_sampling_rate * pre_padding_length);
-        converted_wave[index*num_channels] = wave[i] * volume_scale;
-        if (output_stereo) converted_wave[index*num_channels+1] = wave[i] * volume_scale;
+        for (int j = 0; j < repeat_count; j++) {
+            converted_wave[index*repeat_count+j] = wave[i] * volume_scale;
+        }
     }
     return converted_wave;
 }
@@ -258,17 +261,19 @@ Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, 
 Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id) {
     std::vector<float> wave = synthesis(query, speaker_id);
 
-    // TODO: resampling
     float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
     bool output_stereo = query.Get("outputStereo").As<Napi::Boolean>().Value();
+    // TODO: 44.1kHzなどの対応
+    int output_sampling_rate = query.Get("outputSamplingRate").As<Napi::Number>().Int32Value();
 
     char num_channels = output_stereo ? 2 : 1;
     char bit_depth = 16;
+    int repeat_count = (output_sampling_rate / default_sampling_rate) * num_channels;
     int block_size = bit_depth * num_channels / 8;
 
     std::stringstream ss;
     ss.write("RIFF", 4);
-    int bytes_size = wave.size() * num_channels * 8;
+    int bytes_size = wave.size() * repeat_count * 8;
     int wave_size = bytes_size + 44 - 8;
     for (int i = 0; i < 4; i++) {
         ss.put((uint8_t)(wave_size & 0xff)); // chunk size
@@ -283,12 +288,12 @@ Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::O
     ss.put(num_channels); // channnel
     ss.put(0); // channnel
 
-    int sampling_rate = default_sampling_rate;
+    int sampling_rate = output_sampling_rate;
     for (int i = 0; i < 4; i++) {
         ss.put((char)(sampling_rate & 0xff));
         sampling_rate >>= 8;
     }
-    int block_rate = default_sampling_rate * block_size;
+    int block_rate = output_sampling_rate * block_size;
     for (int i = 0; i < 4; i++) {
         ss.put((char)(block_rate & 0xff));
         block_rate >>= 8;
@@ -310,9 +315,7 @@ Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::O
     for (size_t i = (size_t)((float)default_sampling_rate * pre_padding_length); i < wave.size(); i++) {
         float v = wave[i] * volume_scale;
         int16_t data = (int16_t)(std::min(1.0f, std::max(v, -1.0f)) * (float)0x7fff);
-        ss.put((char)(data & 0xff));
-        ss.put((char)((data & 0xff00) >> 8));
-        if (output_stereo) {
+        for (int j = 0; j < repeat_count; j++) {
             ss.put((char)(data & 0xff));
             ss.put((char)((data & 0xff00) >> 8));
         }
