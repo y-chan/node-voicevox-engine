@@ -44,26 +44,26 @@
     "binding.gyp"
   ],
   "dependencies": {
-    "@types/node": "^16.9.1",
     "bindings": "^1.5.0",
-    "fastify": "^3.22.0",
-    "fastify-cors": "^6.0.2",
-    "fastify-swagger": "^4.12.4",
     "node-addon-api": "^4.1.0",
     "node-fetch": "^2.6.5",
-    "tar": "^6.1.11",
-    "ts-node": "^10.2.1",
-    "typescript": "^4.4.3"
+    "tar": "^6.1.11"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.31.0",
     "@typescript-eslint/parser": "^4.31.0",
+    "@types/node": "^16.9.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
+    "fastify": "^3.22.0",
+    "fastify-cors": "^6.0.2",
+    "fastify-swagger": "^4.12.4",
     "node-gyp": "^8.2.0",
     "prettier": "^2.4.0",
-    "tsconfig-paths": "^3.11.0"
+    "tsconfig-paths": "^3.11.0",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
   }
 }
