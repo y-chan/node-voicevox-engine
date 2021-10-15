@@ -80,8 +80,8 @@ bool Core::decode_forward(
     float *output
 )
 {
-	DECODE decode = (DECODE)GetProcAddress(m_handler, "decode_forward");
-        return decode(
+    DECODE decode = (DECODE)GetProcAddress(m_handler, "decode_forward");
+    return decode(
         length,
         phoneme_size,
         f0,
