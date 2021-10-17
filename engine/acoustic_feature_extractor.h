@@ -62,6 +62,12 @@ public:
     static const int num_phoneme() { return phoneme_map().size(); }
     static const std::string space_phoneme() { return std::string("pau"); }
 
+    OjtPhoneme() {
+        phoneme = "";
+        start = 0.0;
+        end = 0.0;
+    }
+
     OjtPhoneme(std::string c_phoneme, float c_start, float c_end) {
         phoneme = c_phoneme;
         start = c_start;

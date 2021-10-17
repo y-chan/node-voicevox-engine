@@ -1,6 +1,7 @@
 #include "acoustic_feature_extractor.h"
 
 long OjtPhoneme::phoneme_id() {
+    if (phoneme == "") return (long)-1;
     return (long)phoneme_map().at(phoneme);
 }
 

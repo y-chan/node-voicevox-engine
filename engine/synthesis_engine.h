@@ -21,7 +21,7 @@ std::vector<Napi::Object> to_flatten_moras(Napi::Array accent_phrases);
 std::vector<OjtPhoneme> to_phoneme_data_list(std::vector<std::string> phoneme_str_list);
 void split_mora(
     std::vector<OjtPhoneme> phoneme_list,
-    std::vector<OjtPhoneme *> &consonant_phoneme_list,
+    std::vector<OjtPhoneme> &consonant_phoneme_list,
     std::vector<OjtPhoneme> &vowel_phoneme_list,
     std::vector<long> &vowel_indexes
 );
