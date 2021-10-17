@@ -75,7 +75,7 @@ Napi::Array SynthesisEngine::replace_mora_data(Napi::Array accent_phrases, long 
     );
 }
 
-Napi::Array SynthesisEngine::replace_phoneme_length(Napi::Array accent_phrases, long speaker_id) {
+Napi::Array SynthesisEngine::replace_phoneme_length(Napi::Array accent_phrases, int64_t speaker_id) {
     std::vector<Napi::Object> flatten_moras;
     std::vector<std::string> phoneme_str_list;
     std::vector<OjtPhoneme> phoneme_data_list;
@@ -86,10 +86,10 @@ Napi::Array SynthesisEngine::replace_phoneme_length(Napi::Array accent_phrases, 
     std::vector<long> vowel_indexes_data;
     split_mora(phoneme_data_list, consonant_phoneme_list, vowel_phoneme_list, vowel_indexes_data);
 
-    std::vector<long> phoneme_list_s;
+    std::vector<int64_t> phoneme_list_s;
     for (OjtPhoneme phoneme_data : phoneme_data_list) phoneme_list_s.push_back(phoneme_data.phoneme_id());
     std::vector<float> phoneme_length(phoneme_list_s.size(), 0.0);
-    bool success = m_core->yukarin_s_forward(phoneme_list_s.size(), phoneme_list_s.data(), &speaker_id, phoneme_length.data());
+    bool success = m_core->yukarin_s_forward(phoneme_list_s.size(), (long *)phoneme_list_s.data(), (long *)&speaker_id, phoneme_length.data());
 
     if (!success) {
         throw std::runtime_error(m_core->last_error_message());
