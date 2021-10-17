@@ -339,7 +339,7 @@ Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::O
     return Napi::Buffer<char>::Copy(env, ss.str().c_str(), size);
 }
 
-std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_id) {
+std::vector<float> SynthesisEngine::synthesis(Napi::Object query, int64_t speaker_id) {
     float rate = 200;
 
     Napi::Array accent_phrases = query.Get("accent_phrases").As<Napi::Array>();
@@ -432,7 +432,7 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Object query, long speaker_i
         OjtPhoneme::num_phoneme(),
         f0.data(),
         flatten_phoneme.data(),
-        &speaker_id,
+        (long *)&speaker_id,
         wave.data()
     );
 

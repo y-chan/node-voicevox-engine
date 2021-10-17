@@ -44,7 +44,7 @@ public:
 private:
     Core *m_core;
 
-    std::vector<float> synthesis(Napi::Object query, long speaker_id);
+    std::vector<float> synthesis(Napi::Object query, int64_t speaker_id);
     void initail_process(
         Napi::Array accent_phrases,
         std::vector<Napi::Object> &flatten_moras,
