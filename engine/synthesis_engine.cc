@@ -132,27 +132,27 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
     std::vector<long> base_start_accent_phrase_list;
     std::vector<long> base_end_accent_phrase_list;
 
+    base_start_accent_list.push_back(0);
+    base_end_accent_list.push_back(0);
+    base_start_accent_phrase_list.push_back(0);
+    base_end_accent_phrase_list.push_back(0);
     for (uint32_t i = 0; i < accent_phrases.Length(); i++) {
-        base_start_accent_list.push_back(0);
         Napi::Value accent_phrase = accent_phrases[i];
         Napi::Object accent_phrase_object = accent_phrase.As<Napi::Object>();
         int accent = accent_phrase_object.Get("accent").As<Napi::Number>().Int32Value() == 1 ? 0 : 1;
         create_one_accent_list(base_start_accent_list, accent_phrase_object, accent);
-        base_start_accent_list.push_back(0);
 
-        base_end_accent_list.push_back(0);
         accent = accent_phrase_object.Get("accent").As<Napi::Number>().Int32Value() - 1;
         create_one_accent_list(base_end_accent_list, accent_phrase_object, accent);
-        base_end_accent_list.push_back(0);
 
-        base_start_accent_phrase_list.push_back(0);
         create_one_accent_list(base_start_accent_phrase_list, accent_phrase_object, 0);
-        base_start_accent_phrase_list.push_back(0);
 
-        base_end_accent_phrase_list.push_back(0);
         create_one_accent_list(base_end_accent_phrase_list, accent_phrase_object, -1);
-        base_end_accent_phrase_list.push_back(0);
     }
+    base_start_accent_list.push_back(0);
+    base_end_accent_list.push_back(0);
+    base_start_accent_phrase_list.push_back(0);
+    base_end_accent_phrase_list.push_back(0);
 
     std::vector<OjtPhoneme> consonant_phoneme_data_list;
     std::vector<OjtPhoneme> vowel_phoneme_data_list;
@@ -470,8 +470,8 @@ void SynthesisEngine::create_one_accent_list(std::vector<long> &accent_list, Nap
         Napi::Value mora = moras[i];
         Napi::Object mora_object = mora.As<Napi::Object>();
         long value;
-        if ((int)i == point || (point < 0 && (int)i == moras.Length() - point)) value = 1;
-        else value = 1;
+        if ((int)i == point || (point < 0 && (int)i == moras.Length() - 1)) value = 1;
+        else value = 0;
         one_accent_list.push_back(value);
         if (mora_object.Get("consonant").IsString()) {
             one_accent_list.push_back(value);
