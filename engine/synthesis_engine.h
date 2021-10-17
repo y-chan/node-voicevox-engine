@@ -37,14 +37,14 @@ public:
     }
 
     Napi::Array replace_mora_data(Napi::Array accent_phrases, long speaker_id);
-    Napi::Array replace_phoneme_length(Napi::Array accent_phrases, long speaker_id);
-    Napi::Array replace_mora_pitch(Napi::Array accent_phrases, long speaker_id);
+    Napi::Array replace_phoneme_length(Napi::Array accent_phrases, int64_t speaker_id);
+    Napi::Array replace_mora_pitch(Napi::Array accent_phrases, int64_t speaker_id);
     Napi::Array synthesis_array(Napi::Env env, Napi::Object query, long speaker_id);
     Napi::Buffer<char> synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id);
 private:
     Core *m_core;
 
-    std::vector<float> synthesis(Napi::Object query, long speaker_id);
+    std::vector<float> synthesis(Napi::Object query, int64_t speaker_id);
     void initail_process(
         Napi::Array accent_phrases,
         std::vector<Napi::Object> &flatten_moras,
