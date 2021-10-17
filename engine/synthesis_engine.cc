@@ -52,9 +52,9 @@ void split_mora(
         vowel_phoneme_list.push_back(phoneme_list[index]);
     }
     consonant_phoneme_list.push_back(OjtPhoneme());
-    for (size_t i = 1; i < vowel_indexes.size(); i++) {
-        int prev = vowel_indexes[vowel_indexes.size() - 1 - i];
-        int next = vowel_indexes[i];
+    for (size_t i = 0; i < vowel_indexes.size() - 1; i++) {
+        int prev = vowel_indexes[i];
+        int next = vowel_indexes[1 + i];
         if (next - prev == 1) {
             consonant_phoneme_list.push_back(OjtPhoneme());
         } else {
