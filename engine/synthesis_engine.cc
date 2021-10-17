@@ -121,7 +121,7 @@ Napi::Array SynthesisEngine::replace_phoneme_length(Napi::Array accent_phrases, 
     return accent_phrases;
 }
 
-Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long speaker_id) {
+Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, int64_t speaker_id) {
     std::vector<Napi::Object> flatten_moras;
     std::vector<std::string> phoneme_str_list;
     std::vector<OjtPhoneme> phoneme_data_list;
@@ -159,20 +159,20 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
     std::vector<long> vowel_indexes;
     split_mora(phoneme_data_list, consonant_phoneme_data_list, vowel_phoneme_data_list, vowel_indexes);
 
-    std::vector<long> consonant_phoneme_list;
+    std::vector<int64_t> consonant_phoneme_list;
     for (OjtPhoneme consonant_phoneme_data : consonant_phoneme_data_list) {
         consonant_phoneme_list.push_back(consonant_phoneme_data.phoneme_id());
     }
 
-    std::vector<long> vowel_phoneme_list;
+    std::vector<int64_t> vowel_phoneme_list;
     for (OjtPhoneme vowel_phoneme_data : vowel_phoneme_data_list) {
         vowel_phoneme_list.push_back(vowel_phoneme_data.phoneme_id());
     }
 
-    std::vector<long> start_accent_list;
-    std::vector<long> end_accent_list;
-    std::vector<long> start_accent_phrase_list;
-    std::vector<long> end_accent_phrase_list;
+    std::vector<int64_t> start_accent_list;
+    std::vector<int64_t> end_accent_list;
+    std::vector<int64_t> start_accent_phrase_list;
+    std::vector<int64_t> end_accent_phrase_list;
 
     for (long vowel_index : vowel_indexes) {
         start_accent_list.push_back(base_start_accent_list[vowel_index]);
@@ -185,13 +185,13 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, long
     std::vector<float> f0_list(length, 0);
     bool success = m_core->yukarin_sa_forward(
         length,
-        vowel_phoneme_list.data(),
-        consonant_phoneme_list.data(),
-        start_accent_list.data(),
-        end_accent_list.data(),
-        start_accent_phrase_list.data(),
-        end_accent_phrase_list.data(),
-        &speaker_id,
+        (long *)vowel_phoneme_list.data(),
+        (long *)consonant_phoneme_list.data(),
+        (long *)start_accent_list.data(),
+        (long *)end_accent_list.data(),
+        (long *)start_accent_phrase_list.data(),
+        (long *)end_accent_phrase_list.data(),
+        (long *)&speaker_id,
         f0_list.data()
     );
 
