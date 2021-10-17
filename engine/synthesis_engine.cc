@@ -470,7 +470,7 @@ void SynthesisEngine::create_one_accent_list(std::vector<long> &accent_list, Nap
         Napi::Value mora = moras[i];
         Napi::Object mora_object = mora.As<Napi::Object>();
         long value;
-        if ((int)i == point || (point < 0 && (int)i == moras.Length() - 1)) value = 1;
+        if ((int)i == point || (point < 0 && (int)i == moras.Length() + point)) value = 1;
         else value = 0;
         one_accent_list.push_back(value);
         if (mora_object.Get("consonant").IsString()) {
