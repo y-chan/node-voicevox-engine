@@ -77,10 +77,10 @@ EngineWrapper::EngineWrapper(const Napi::CallbackInfo& info)
         // remove file name
         split_path.pop_back();
         if (core_file_path[0] == '/') {
-            root_dir_path = std::string("/");
+            root_dir_path = "/";
         }
         std::for_each(split_path.begin(), split_path.end(), [&](std::string path) {
-            root_dir_path += path + std::string("/");
+            root_dir_path += path + "/";
         });
     }
     try {
@@ -102,7 +102,7 @@ EngineWrapper::~EngineWrapper()
 void EngineWrapper::create_execute_error(Napi::Env env, const char* func_name)
 {
     std::string last_error = std::string(m_core->last_error_message());
-    std::string err = std::string("failed to execute: ") + std::string(func_name) + std::string("\n") + last_error;
+    std::string err = "failed to execute: " + std::string(func_name) + "\n" + last_error;
     Napi::Error::New(env, err).ThrowAsJavaScriptException();
 }
 
