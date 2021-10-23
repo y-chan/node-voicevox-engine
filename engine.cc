@@ -42,7 +42,7 @@ Napi::Object EngineWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("metas", &EngineWrapper::metas),
             InstanceMethod("yukarin_s_forward", &EngineWrapper::yukarin_s_forward),
             InstanceMethod("yukarin_sa_forward", &EngineWrapper::yukarin_sa_forward),
-            // InstanceMethod("decode_forward", &EngineWrapper::decode_forward),
+            InstanceMethod("decode_forward", &EngineWrapper::decode_forward),
         });
 
     Napi::FunctionReference* constructor = new Napi::FunctionReference();
