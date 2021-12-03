@@ -237,6 +237,7 @@ Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, 
     std::vector<float> wave = synthesis(query, speaker_id);
 
     float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
+    float speed_scale = query.Get("speedScale").As<Napi::Number>().FloatValue();
     bool output_stereo = query.Get("outputStereo").As<Napi::Boolean>().Value();
     // TODO: 44.1kHzなどの対応
     int output_sampling_rate = query.Get("outputSamplingRate").As<Napi::Number>().Int32Value();
@@ -246,8 +247,9 @@ Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, 
 
     Napi::Array converted_wave = Napi::Array::New(env, wave.size() * repeat_count);
     // workaround of Hiroshiba/voicevox_engine#128
-    for (size_t i = (size_t)((float)default_sampling_rate * pre_padding_length); i < wave.size(); i++) {
-        size_t index = i - (size_t)((float)default_sampling_rate * pre_padding_length);
+    size_t offset = (size_t)((float)default_sampling_rate * (pre_padding_length / speed_scale));
+    for (size_t i = offset; i < wave.size(); i++) {
+        size_t index = i - offset;
         for (int j = 0; j < repeat_count; j++) {
             converted_wave[index*repeat_count+j] = wave[i] * volume_scale;
         }
@@ -259,6 +261,7 @@ Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::O
     std::vector<float> wave = synthesis(query, speaker_id);
 
     float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
+    float speed_scale = query.Get("speedScale").As<Napi::Number>().FloatValue();
     bool output_stereo = query.Get("outputStereo").As<Napi::Boolean>().Value();
     // TODO: 44.1kHzなどの対応
     int output_sampling_rate = query.Get("outputSamplingRate").As<Napi::Number>().Int32Value();
@@ -309,7 +312,8 @@ Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::O
     }
 
     // workaround of Hiroshiba/voicevox_engine#128
-    for (size_t i = (size_t)((float)default_sampling_rate * pre_padding_length); i < wave.size(); i++) {
+    size_t offset = (size_t)((float)default_sampling_rate * (pre_padding_length / speed_scale));
+    for (size_t i = offset; i < wave.size(); i++) {
         float v = wave[i] * volume_scale;
         int16_t data = (int16_t)(std::min(1.0f, std::max(v, -1.0f)) * (float)0x7fff);
         for (int j = 0; j < repeat_count; j++) {
