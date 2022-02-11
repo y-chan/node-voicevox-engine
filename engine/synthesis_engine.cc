@@ -72,6 +72,7 @@ Napi::Array adjust_interrogative_accent_phrases(Napi::Env env, Napi::Array accen
         Napi::Value accent_phrase = accent_phrases[i];
         Napi::Object accent_phrase_object = accent_phrase.As<Napi::Object>();
         Napi::Object new_accent_phrase = Napi::Object::New(env);
+        new_accent_phrase.Set("moras", adjust_interrogative_moras(env, accent_phrase_object));
         new_accent_phrase.Set("accent", accent_phrase_object.Get("accent"));
         if (accent_phrase_object.Has("pause_mora")) {
             new_accent_phrase.Set("pause_mora", accent_phrase_object.Get("pause_mora"));
