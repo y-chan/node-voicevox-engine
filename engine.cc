@@ -59,7 +59,7 @@ EngineWrapper::EngineWrapper(const Napi::CallbackInfo& info)
     bool use_gpu = info[2].As<Napi::Boolean>().Value();
     std::string root_dir_path;
     if (info[3].IsString()) {
-        root_dir_path = info[2].As<Napi::String>().Utf8Value();
+        root_dir_path = info[3].As<Napi::String>().Utf8Value();
     } else {
         std::vector<std::string> split_path;
         std::string item;
