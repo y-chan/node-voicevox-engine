@@ -66,6 +66,59 @@ void split_mora(
     return;
 }
 
+Napi::Array adjust_interrogative_accent_phrases(Napi::Env env, Napi::Array accent_phrases) {
+    Napi::Array new_accent_phrases = Napi::Array::New(env, accent_phrases.Length());
+    for (size_t i = 0; i < accent_phrases.Length(); i++) {
+        Napi::Value accent_phrase = accent_phrases[i];
+        Napi::Object accent_phrase_object = accent_phrase.As<Napi::Object>();
+        Napi::Object new_accent_phrase = Napi::Object::New(env);
+        new_accent_phrase.Set("accent", accent_phrase_object.Get("accent"));
+        if (accent_phrase_object.Has("pause_mora")) {
+            new_accent_phrase.Set("pause_mora", accent_phrase_object.Get("pause_mora"));
+        }
+        new_accent_phrase.Set("is_interrogative", accent_phrase_object.Get("is_interrogative"));
+        new_accent_phrases[i] = new_accent_phrase;
+    }
+    return new_accent_phrases;
+}
+
+Napi::Array adjust_interrogative_moras(Napi::Env env, Napi::Object accent_phrase) {
+    Napi::Array moras = accent_phrase.Get("moras").As<Napi::Array>();
+    if (accent_phrase.Get("is_interrogative").As<Napi::Boolean>().Value()) {
+        if (moras.Length() != 0) {
+            Napi::Value last_mora = moras[moras.Length() - 1];
+            float last_mora_pitch = last_mora.As<Napi::Object>().Get("pitch").As<Napi::Number>().FloatValue();
+            if (last_mora_pitch != 0.0) {
+                Napi::Array new_moras = Napi::Array::New(env, moras.Length() + 1);
+                for (size_t i = 0; i < moras.Length(); i++) {
+                    new_moras[i] = moras[i];
+                }
+                Napi::Object interrogative_mora = make_interrogative_mora(env, last_mora.As<Napi::Object>());
+                new_moras[moras.Length()] = interrogative_mora;
+                return new_moras;
+            }
+        }
+    }
+    return moras;
+}
+
+Napi::Object make_interrogative_mora(Napi::Env env, Napi::Object last_mora) {
+    float fix_vowel_length = 0.15;
+    float adjust_pitch = 0.3;
+    float  max_pitch = 6.5;
+
+    Napi::Object interrogative_mora = Napi::Object::New(env);
+    interrogative_mora.Set("text", mora2text(last_mora.Get("vowel").As<Napi::String>().Utf8Value()));
+    interrogative_mora.Set("vowel", last_mora.Get("vowel"));
+    interrogative_mora.Set("vowel_length", fix_vowel_length);
+    float pitch = last_mora.Get("pitch").As<Napi::Number>().FloatValue() + adjust_pitch;
+    if (pitch > max_pitch) {
+        pitch = max_pitch;
+    }
+    interrogative_mora.Set("pitch", pitch);
+    return interrogative_mora;
+}
+
 Napi::Array SynthesisEngine::create_accent_phrases(Napi::Env env, Napi::String text, Napi::Number speaker_id) {
     std::string str_text = text.Utf8Value();
     if (str_text.size() == 0) {

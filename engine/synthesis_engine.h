@@ -25,6 +25,9 @@ void split_mora(
     std::vector<OjtPhoneme> &vowel_phoneme_list,
     std::vector<long> &vowel_indexes
 );
+Napi::Array adjust_interrogative_accent_phrases(Napi::Env env, Napi::Array accent_phrases);
+Napi::Array adjust_interrogative_moras(Napi::Env env, Napi::Object accent_phrase);
+Napi::Object make_interrogative_mora(Napi::Env env, Napi::Object last_mora);
 
 class SynthesisEngine {
 public:
