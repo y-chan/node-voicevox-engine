@@ -92,7 +92,7 @@ Napi::Array adjust_interrogative_moras(Napi::Env env, Napi::Object accent_phrase
             if (last_mora_pitch != 0.0) {
                 Napi::Array new_moras = Napi::Array::New(env, moras.Length() + 1);
                 for (size_t i = 0; i < moras.Length(); i++) {
-                    new_moras[i] = moras[i];
+                    new_moras[i] = moras.Get(i);
                 }
                 Napi::Object interrogative_mora = make_interrogative_mora(env, last_mora.As<Napi::Object>());
                 new_moras[moras.Length()] = interrogative_mora;
