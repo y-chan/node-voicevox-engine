@@ -117,16 +117,26 @@ Napi::Array parse_kana(Napi::Env env, std::string text) {
                     "accent phrase at position of " + std::to_string(parsed_results.Length() + 1) +" is empty"
                 );
             }
+            bool is_interrogative = phrase.find(WIDE_INTERROGATION_MARK) != std::string::npos;
+            if (is_interrogative) {
+                if (phrase.find(WIDE_INTERROGATION_MARK) != phrase.length() - 1) {
+                    throw std::runtime_error(
+                        "interrogative mark cannot be set at not end of accent phrase: " + phrase
+                    );
+                }
+                phrase = phrase.replace(phrase.length() - 1, 1, "");
+            }
             Napi::Object accent_phrase = text_to_accent_phrase(env, phrase);
             if (i < text.size() && letter == PAUSE_DELIMITER) {
                 Napi::Object pause_mora = Napi::Object::New(env);
-                pause_mora.Set("text", "、");
+                pause_mora.Set("text", PAUSE_DELIMITER);
                 pause_mora.Set("vowel", "pau");
                 pause_mora.Set("vowel_length", 0.0f);
                 pause_mora.Set("pitch", 0.0f);
 
                 accent_phrase.Set("pause_mora", pause_mora);
             }
+            accent_phrase.Set("is_interrogative", is_interrogative);
             parsed_results[count] = accent_phrase;
             count++;
             phrase = "";
@@ -160,6 +170,10 @@ Napi::String create_kana(Napi::Env env, Napi::Array accent_phrases) {
             if (j + 1 == phrase.Get("accent").As<Napi::Number>().Int32Value()) {
                 text += ACCENT_SYMBOL;
             }
+        }
+
+        if (phrase.Get("is_interrogative").As<Napi::Boolean>().Value()) {
+            text += WIDE_INTERROGATION_MARK;
         }
 
         if (i < accent_phrases.Length()) {

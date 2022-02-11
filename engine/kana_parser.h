@@ -14,6 +14,7 @@ const std::string UNVOICE_SYMBOL = "_";
 const std::string ACCENT_SYMBOL = "'";
 const std::string NOPAUSE_DELIMITER = "/";
 const std::string PAUSE_DELIMITER = "、";
+const std::string WIDE_INTERROGATION_MARK = "？";
 
 static const std::map<std::string, Napi::Object> text2mora_with_unvoice();
 
