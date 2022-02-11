@@ -436,7 +436,10 @@ Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::O
     size_t offset = (size_t)((float)default_sampling_rate * (pre_padding_length / speed_scale));
     for (size_t i = offset; i < wave.size(); i++) {
         float v = wave[i] * volume_scale;
-        int16_t data = (int16_t)(std::min(1.0f, std::max(v, -1.0f)) * (float)0x7fff);
+        // clip
+        v = 1.0 < v ? 1.0 : v;
+        v = -1.0 > v ? -1.0 : v;
+        int16_t data = (int16_t)(v * (float)0x7fff);
         for (int j = 0; j < repeat_count; j++) {
             ss.put((char)(data & 0xff));
             ss.put((char)((data & 0xff00) >> 8));
