@@ -42,7 +42,11 @@ interface IEngine {
     speaker_id: number
   ): AccentPhrase[]
   mora_pitch(accent_phrases: AccentPhrase[], speaker_id: number): AccentPhrase[]
-  synthesis(audio_query: AudioQuery, speaker_id: number): Buffer
+  synthesis(
+    audio_query: AudioQuery,
+    speaker_id: number,
+    enable_interrogative_upspeak?: boolean
+  ): Buffer
   metas(): string
   yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[]
   yukarin_sa_forward(
@@ -161,10 +165,19 @@ class Engine implements IEngine {
    * 音声合成をする
    * @param {AudioQuery} audio_query - 音声合成用のクエリ
    * @param {number} speaker_id - 話者ID
+   * @param {boolean} enable_interrogative_upspeak - 疑問文対応
    * @return {Buffer} - 音声合成されたwav形式のバイナリ
    */
-  synthesis(audio_query: AudioQuery, speaker_id: number): Buffer {
-    return this.addon.synthesis(audio_query, speaker_id)
+  synthesis(
+    audio_query: AudioQuery,
+    speaker_id: number,
+    enable_interrogative_upspeak?: boolean
+  ): Buffer {
+    return this.addon.synthesis(
+      audio_query,
+      speaker_id,
+      enable_interrogative_upspeak || true
+    )
   }
 
   /**

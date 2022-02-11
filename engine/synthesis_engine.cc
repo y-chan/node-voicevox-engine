@@ -354,8 +354,8 @@ Napi::Array SynthesisEngine::replace_mora_pitch(Napi::Array accent_phrases, int6
     return accent_phrases;
 }
 
-Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, long speaker_id) {
-    std::vector<float> wave = synthesis(query, speaker_id);
+Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, long speaker_id, bool enable_interrogative_upspeak) {
+    std::vector<float> wave = synthesis(env, query, speaker_id, enable_interrogative_upspeak);
 
     float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
     float speed_scale = query.Get("speedScale").As<Napi::Number>().FloatValue();
@@ -378,8 +378,8 @@ Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, 
     return converted_wave;
 }
 
-Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id) {
-    std::vector<float> wave = synthesis(query, speaker_id);
+Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id, bool enable_interrogative_upspeak) {
+    std::vector<float> wave = synthesis(env, query, speaker_id, enable_interrogative_upspeak);
 
     float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
     float speed_scale = query.Get("speedScale").As<Napi::Number>().FloatValue();
@@ -464,10 +464,13 @@ Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::O
     return Napi::Buffer<char>::Copy(env, ss.str().c_str(), size);
 }
 
-std::vector<float> SynthesisEngine::synthesis(Napi::Object query, int64_t speaker_id) {
+std::vector<float> SynthesisEngine::synthesis(Napi::Env env, Napi::Object query, int64_t speaker_id, bool enable_interrogative_upspeak) {
     float rate = 200;
 
     Napi::Array accent_phrases = query.Get("accent_phrases").As<Napi::Array>();
+    if (enable_interrogative_upspeak) {
+        accent_phrases = adjust_interrogative_accent_phrases(env, accent_phrases);
+    }
     std::vector<Napi::Object> flatten_moras;
     std::vector<std::string> phoneme_str_list;
     std::vector<OjtPhoneme> phoneme_data_list;

@@ -228,12 +228,12 @@ Napi::Value EngineWrapper::mora_pitch(const Napi::CallbackInfo& info) {
 
 Napi::Value EngineWrapper::synthesis(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    if (info.Length() < 2) {
+    if (info.Length() < 3) {
         Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
 
-    if (!info[0].IsObject() || !info[1].IsNumber()) {
+    if (!info[0].IsObject() || !info[1].IsNumber() || !info[2].IsBoolean()) {
         Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
         return env.Null();
     }
@@ -282,7 +282,7 @@ Napi::Value EngineWrapper::synthesis(const Napi::CallbackInfo& info) {
         return env.Null();
     }
 
-    return m_engine->synthesis_wave_format(env, audio_query, info[1].As<Napi::Number>().Int64Value());
+    return m_engine->synthesis_wave_format(env, audio_query, info[1].As<Napi::Number>().Int64Value(), info[2].As<Napi::Boolean>().Value());
 }
 
 Napi::Value EngineWrapper::metas(const Napi::CallbackInfo& info)
