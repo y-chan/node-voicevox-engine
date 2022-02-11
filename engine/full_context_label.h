@@ -47,10 +47,12 @@ class AccentPhrase {
 public:
     std::vector<Mora *> moras;
     int accent;
+    bool is_interrogative;
 
-    AccentPhrase(std::vector<Mora *> moras, int accent) {
+    AccentPhrase(std::vector<Mora *> moras, int accent, bool is_interrogative) {
         this->moras = moras;
         this->accent = accent;
+        this->is_interrogative = is_interrogative;
     }
 
     static AccentPhrase *from_phonemes(std::vector<Phoneme *> phonemes);

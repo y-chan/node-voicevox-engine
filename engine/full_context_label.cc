@@ -88,9 +88,10 @@ AccentPhrase *AccentPhrase::from_phonemes(std::vector<Phoneme *> phonemes) {
     }
 
     int accent = std::stoi(moras[0]->vowel->contexts.at("f2"));
+    bool is_interrogative = moras[moras.size() - 1]->vowel->contexts.at("f3") == "1";
     // workaround for Hihosiba / voicevox_engine#55
     if (accent > moras.size()) accent = moras.size();
-    return new AccentPhrase(moras, accent);
+    return new AccentPhrase(moras, accent, is_interrogative);
  }
 
 void AccentPhrase::set_context(std::string key, std::string value) {
@@ -130,7 +131,7 @@ AccentPhrase *AccentPhrase::merge(AccentPhrase *accent_phrase) {
         accent_phrase->moras.end(),
         std::back_inserter(moras)
     );
-    return new AccentPhrase(moras, this->accent);
+    return new AccentPhrase(moras, this->accent, accent_phrase->is_interrogative);
 }
 
 BreathGroup *BreathGroup::from_phonemes(std::vector<Phoneme *> phonemes) {

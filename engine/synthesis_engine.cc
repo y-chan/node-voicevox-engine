@@ -112,6 +112,7 @@ Napi::Array SynthesisEngine::create_accent_phrases(Napi::Env env, Napi::String t
 
             new_accent_phrase.Set("moras", moras);
             new_accent_phrase.Set("accent", accent_phrase->accent);
+            new_accent_phrase.Set("is_interrogative", accent_phrase->is_interrogative);
 
             if (i != utterance.breath_groups.size() - 1 && j == breath_group->accent_phrases.size() - 1) {
                 Napi::Object pause_mora = Napi::Object::New(env);
