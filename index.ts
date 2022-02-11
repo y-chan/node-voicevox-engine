@@ -119,7 +119,7 @@ class Engine implements IEngine {
     speaker_id: number,
     is_kana?: boolean
   ): AccentPhrase[] {
-    return this.addon.accent_phrases(text, speaker_id, is_kana || false)
+    return this.addon.accent_phrases(text, speaker_id, is_kana ?? false)
   }
 
   /**
@@ -176,7 +176,7 @@ class Engine implements IEngine {
     return this.addon.synthesis(
       audio_query,
       speaker_id,
-      enable_interrogative_upspeak || true
+      enable_interrogative_upspeak ?? true
     )
   }
 
