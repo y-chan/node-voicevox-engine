@@ -30,10 +30,8 @@ public:
 
 private:
     void create_execute_error(Napi::Env env, const char* func_name);
-    Napi::Array create_accent_phrases(Napi::Env env, Napi::String text, Napi::Number speaker_id);
 
     Core* m_core;
-    OpenJTalk* m_openjtalk;
     SynthesisEngine* m_engine;
 };
 

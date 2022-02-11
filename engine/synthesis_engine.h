@@ -32,10 +32,12 @@ public:
     // workaround of Hiroshiba/voicevox_engine#128
     const float pre_padding_length = 0.4;
 
-    SynthesisEngine(Core *core) {
+    SynthesisEngine(Core *core, OpenJTalk* openjtalk) {
         m_core = core;
+        m_openjtalk = openjtalk;
     }
 
+    Napi::Array create_accent_phrases(Napi::Env env, Napi::String text, Napi::Number speaker_id);
     Napi::Array replace_mora_data(Napi::Array accent_phrases, long speaker_id);
     Napi::Array replace_phoneme_length(Napi::Array accent_phrases, int64_t speaker_id);
     Napi::Array replace_mora_pitch(Napi::Array accent_phrases, int64_t speaker_id);
@@ -43,6 +45,7 @@ public:
     Napi::Buffer<char> synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id);
 private:
     Core *m_core;
+    OpenJTalk* m_openjtalk;
 
     std::vector<float> synthesis(Napi::Object query, int64_t speaker_id);
     void initail_process(

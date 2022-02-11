@@ -5,9 +5,7 @@
 #include <iostream>
 
 #include "engine.h"
-#include "engine/full_context_label.h"
 #include "engine/kana_parser.h"
-#include "engine/mora_list.h"
 
 using namespace Napi;
 
@@ -85,8 +83,8 @@ EngineWrapper::EngineWrapper(const Napi::CallbackInfo& info)
     }
     try {
         m_core = new Core(core_file_path, root_dir_path, use_gpu);
-        m_openjtalk = new OpenJTalk(openjtalk_dict);
-        m_engine = new SynthesisEngine(m_core);
+        OpenJTalk* openjtalk = new OpenJTalk(openjtalk_dict);
+        m_engine = new SynthesisEngine(m_core, openjtalk);
     }
     catch (std::exception& err) {
         Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
@@ -106,72 +104,6 @@ void EngineWrapper::create_execute_error(Napi::Env env, const char* func_name)
     Napi::Error::New(env, err).ThrowAsJavaScriptException();
 }
 
-Napi::Array EngineWrapper::create_accent_phrases(Napi::Env env, Napi::String text, Napi::Number speaker_id) {
-    std::string str_text = text.Utf8Value();
-    if (str_text.size() == 0) {
-        return Napi::Array::New(env);
-    }
-
-    Utterance utterance = extract_full_context_label(m_openjtalk, str_text);
-    if (utterance.breath_groups.size() == 0) {
-        return Napi::Array::New(env);
-    }
-
-    int accent_phrases_size = 0;
-    for (BreathGroup *breath_group : utterance.breath_groups) accent_phrases_size += breath_group->accent_phrases.size();
-    Napi::Array accent_phrases = Napi::Array::New(env, accent_phrases_size);
-
-    int accent_phrases_count = 0;
-    for (size_t i = 0; i < utterance.breath_groups.size(); i++) {
-        BreathGroup *breath_group = utterance.breath_groups[i];
-        for (size_t j = 0; j < breath_group->accent_phrases.size(); j++) {
-            AccentPhrase *accent_phrase = breath_group->accent_phrases[j];
-            Napi::Object new_accent_phrase = Napi::Object::New(env);
-
-            Napi::Array moras = Napi::Array::New(env, accent_phrase->moras.size());
-            for (size_t k = 0; k < accent_phrase->moras.size(); k++) {
-                Mora *mora = accent_phrase->moras[k];
-                Napi::Object new_mora = Napi::Object::New(env);
-
-                std::string moras_text = "";
-                for (Phoneme *phoneme : mora->phonemes()) moras_text += phoneme->phoneme();
-                std::transform(moras_text.begin(), moras_text.end(), moras_text.begin(), ::tolower);
-                if (moras_text == "n") moras_text = "N";
-                new_mora.Set("text", mora2text(moras_text));
-
-                if (mora->consonant != nullptr) {
-                    new_mora.Set("consonant", mora->consonant->phoneme());
-                    new_mora.Set("consonant_length", 0.0f);
-                }
-                new_mora.Set("vowel", mora->vowel->phoneme());
-                new_mora.Set("vowel_length", 0.0f);
-                new_mora.Set("pitch", 0.0f);
-
-                moras[k] = new_mora;
-            }
-
-            new_accent_phrase.Set("moras", moras);
-            new_accent_phrase.Set("accent", accent_phrase->accent);
-
-            if (i != utterance.breath_groups.size() - 1 && j == breath_group->accent_phrases.size() - 1) {
-                Napi::Object pause_mora = Napi::Object::New(env);
-                pause_mora.Set("text", "、");
-                pause_mora.Set("vowel", "pau");
-                pause_mora.Set("vowel_length", 0.0f);
-                pause_mora.Set("pitch", 0.0f);
-
-                new_accent_phrase.Set("pause_mora", pause_mora);
-            }
-            accent_phrases[accent_phrases_count] = new_accent_phrase;
-            accent_phrases_count++;
-        }
-    }
-
-    accent_phrases = m_engine->replace_mora_data(accent_phrases, speaker_id.Int64Value());
-
-    return accent_phrases;
-}
-
 Napi::Value EngineWrapper::audio_query(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (info.Length() < 2) {
@@ -186,7 +118,7 @@ Napi::Value EngineWrapper::audio_query(const Napi::CallbackInfo& info) {
 
     Napi::Array accent_phrases;
     try {
-        accent_phrases = create_accent_phrases(env, info[0].As<Napi::String>(), info[1].As<Napi::Number>());
+        accent_phrases = m_engine->create_accent_phrases(env, info[0].As<Napi::String>(), info[1].As<Napi::Number>());
     } catch (std::exception& err) {
         Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
         return env.Null();
@@ -240,7 +172,7 @@ Napi::Value EngineWrapper::accent_phrases(const Napi::CallbackInfo& info) {
         accent_phrases = m_engine->replace_mora_data(accent_phrases, info[1].As<Napi::Number>().Int64Value());
     }
     else {
-        accent_phrases = create_accent_phrases(env, info[0].As<Napi::String>(), info[1].As<Napi::Number>());
+        accent_phrases = m_engine->create_accent_phrases(env, info[0].As<Napi::String>(), info[1].As<Napi::Number>());
     }
 
     return accent_phrases;
