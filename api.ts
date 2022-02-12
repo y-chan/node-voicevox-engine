@@ -47,6 +47,7 @@ interface MoraApiQuery {
 
 interface SynthesisApiQuery {
   speaker: number
+  enable_interrogative_upspeak?: boolean
 }
 
 interface RequestContent<Q, B = unknown> {
@@ -161,6 +162,7 @@ const SynthesisApiSchema: FastifySchema = {
     required: ['speaker'],
     properties: {
       speaker: { type: 'number' },
+      enable_interrogative_upspeak: { type: 'boolean' },
     },
   },
 }
@@ -276,7 +278,8 @@ server.post<RequestContent<SynthesisApiQuery, AudioQuery>>(
     try {
       const result = engine.synthesis(
         request.body,
-        request.query.speaker
+        request.query.speaker,
+        request.query.enable_interrogative_upspeak
       )
       void reply.type('audio/wav').code(200)
       return result
