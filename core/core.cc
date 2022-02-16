@@ -23,7 +23,8 @@ Core::Core(const std::string core_file_path, const std::string root_dir_path, bo
 		throw std::runtime_error("to load library is succeeded, but can't found needed functions");
 	}
 	m_handler = handler;
-    if (!initialize((char *)root_dir_path.c_str(), use_gpu)) {
+    // TODO: make cpu_num_threads changeable
+    if (!initialize((char *)root_dir_path.c_str(), use_gpu, 0)) {
         throw std::runtime_error("failed to initialize core library");
     }
 }

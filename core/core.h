@@ -16,7 +16,7 @@ typedef void* HMODULE;
 typedef void* FARPROC;
 #endif
 
-typedef bool (*INIT)(char *root_dir_path, bool use_gpu);
+typedef bool (*INIT)(char *root_dir_path, bool use_gpu, int cpu_num_threads);
 typedef const char *(*RETURN_CHAR)();
 typedef bool (*YUKARIN_S)(int length, long *phoneme_list, long *speaker_id, float *output);
 typedef bool (*YUKARIN_SA)(
