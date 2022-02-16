@@ -11,11 +11,11 @@
 ## 使用にあたって
 本ライブラリの使用にあたっては、利用者自身が[VOICEVOX Core公開のサイト](https://github.com/Hiroshiba/voicevox_core/releases/latest)より、
 VOICEVOX Coreライブラリをダウンロードし、そのライブラリのパスを指定しなければなりません。
-[加えてLibtorchやCUDAなどのインストール](https://github.com/Hiroshiba/voicevox_core#%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82)も必要です。
+[加えてONNX RuntimeやCUDAなどのインストール](https://github.com/Hiroshiba/voicevox_core#%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82)も必要です。
 本ライブラリのみで完結はしませんのでご注意ください。
 なお、CPU版を利用する場合はCUDA/CUDNNは必要ありません。
 
-なお、製品版VOICEVOXの`core.dll`/`libcore.so`を指定することで、複雑なインストール処理を省略することも可能です。
+なお、製品版VOICEVOXの`core.dll`/`libcore.so`/`libcore.dylib`を指定することで、複雑なインストール処理を省略することも可能です。
 この場合、環境変数の`Path`(Windowsの場合)に製品版VOICEVOXのディレクトリを追加しておく必要があります。
 
 ## ドキュメント
