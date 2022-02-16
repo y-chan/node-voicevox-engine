@@ -2,32 +2,31 @@
 
 #include "full_context_label.h"
 
-Phoneme *Phoneme::from_label(const std::string label) {
-    std::regex re(
-        "^(.+?)\\^(.+?)\\-(.+?)\\+(.+?)\\=(.+?)"
-        "/A\\:(.+?)\\+(.+?)\\+(.+?)/B\\:(.+?)\\-(.+?)\\_(.+?)"
-        "/C\\:(.+?)\\_(.+?)\\+(.+?)/D\\:(.+?)\\+(.+?)\\_(.+?)"
-        "/E\\:(.+?)\\_(.+?)\\!(.+?)\\_(.+?)\\-(.+?)"
-        "/F\\:(.+?)\\_(.+?)\\#(.+?)\\_(.+?)\\@(.+?)\\_(.+?)\\|(.+?)\\_(.+?)"
-        "/G\\:(.+?)\\_(.+?)\\%(.+?)\\_(.+?)\\_(.+?)/H\\:(.+?)\\_(.+?)"
-        "/I\\:(.+?)\\-(.+?)\\@(.+?)\\+(.+?)\\&(.+?)\\-(.+?)\\|(.+?)\\+(.+?)"
-        "/J\\:(.+?)\\_(.+?)/K\\:(.+?)\\+(.+?)\\-(.+?)$"
-    );
+std::string string_feature_by_regex(std::string pattern, std::string label) {
+    std::regex re(pattern);
     std::smatch match;
-    if (std::regex_match(label, match, re)) {
-        std::map<std::string, std::string> contexts;
-        std::vector<std::string> keys = {
-            "p1", "p2", "p3", "p4", "p5", "a1", "a2", "a3", "b1", "b2",
-            "b3", "c1", "c2", "c3", "d1", "d2", "d3", "e1", "e2", "e3",
-            "e4", "e5", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8",
-            "g1", "g2", "g3", "g4", "g5", "h1", "h2", "i1", "i2", "i3",
-            "i4", "i5", "i6", "i7", "i8", "j1", "j2", "k1", "k2", "k3"
-        };
-        for (int i = 1; i < match.size(); i++) contexts[keys[i-1]] = match[i];
-        return new Phoneme(contexts, label);
+    if (std::regex_search(label, match, re)) {
+        return match[1].str();
     } else {
         throw std::runtime_error("label is broken");
     }
+}
+
+
+Phoneme *Phoneme::from_label(const std::string label) {
+    std::map<std::string, std::string> contexts;
+    contexts["p3"] = string_feature_by_regex(R"(\-(.*?)\+)", label);
+    contexts["a2"] = string_feature_by_regex(R"(\+(\d+|xx)\+)", label);
+    contexts["a3"] = string_feature_by_regex(R"(\+(\d+|xx)/B\:)", label);
+    contexts["f1"] = string_feature_by_regex(R"(/F:(\d+|xx)_)", label);
+    contexts["f2"] = string_feature_by_regex(R"(_(\d+|xx)\#)", label);
+    contexts["f3"] = string_feature_by_regex(R"(\#(\d+|xx)_)", label);
+    contexts["f5"] = string_feature_by_regex(R"(\@(\d+|xx)_)", label);
+    contexts["h1"] = string_feature_by_regex(R"(/H\:(\d+|xx)_)", label);
+    contexts["i3"] = string_feature_by_regex(R"(\@(\d+|xx)\+)", label);
+    contexts["j1"] = string_feature_by_regex(R"(/J\:(\d+|xx)_)", label);
+
+    return new Phoneme(contexts, label);
 }
 
 const std::string Phoneme::phoneme() {

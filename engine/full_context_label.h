@@ -7,6 +7,8 @@
 
 #include "openjtalk.h"
 
+std::string string_feature_by_regex(std::string pattern, std::string label);
+
 class Phoneme {
 public:
     std::map<std::string, std::string> contexts;
