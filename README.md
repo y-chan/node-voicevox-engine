@@ -24,13 +24,14 @@ VOICEVOX Coreライブラリをダウンロードし、そのライブラリの�
 ## 音声合成エンジンとしての利用
 本ライブラリはVOICEVOXの音声合成エンジンとして利用可能です。
 [`api.ts`内の`core.dll`となっている部分](https://github.com/y-chan/node-voicevox-engine/blob/main/api.ts#L30)をフルパスに変更し、以下のようなコマンドをご利用ください。
-なお、音声ライブラリファイル群が`core.dll`/`libcore.so`と同じディレクトリ階層にある前提です。
+なお、音声ライブラリファイル群が`core.dll`/`libcore.so`/`libcore.dylib`と同じディレクトリ階層にある前提です。
 ```bash
 # ビルドと依存関係・OpenJTalk辞書のダウンロード
 # npm なら npm install
 yarn inatall
-# 実行する、npm なら npm start
+# 実行する。npm なら npm start
 # libtorchの存在する場所によってパスを適切に変更してください
+# Macの場合はDYDL_LIBRARY_PATH
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/libtorch/lib/" yarn start
 ```
 
@@ -38,13 +39,14 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/libtorch/lib/" yarn start
 ## ライブラリとしての使用例
 [example](example/index.ts)をご覧ください。
 なお、実行する際は[`example.ts`内の`core.dll`となっている部分](https://github.com/y-chan/node-voicevox-engine/blob/main/example/index.ts#L5)をフルパスに変更し、以下のようなコマンドをご利用ください。
-なお、音声ライブラリファイル群が`core.dll`/`libcore.so`と同じディレクトリ階層にある前提です。
+なお、音声ライブラリファイル群が`core.dll`/`libcore.so`/`libcore.dylib`と同じディレクトリ階層にある前提です。
 ```bash
 # ビルドと依存関係・OpenJTalk辞書のダウンロード
 # npm なら npm install
 yarn inatall
-# 実行する、npm なら npm run example
+# 実行する。npm なら npm run example
 # libtorchの存在する場所によってパスを適切に変更してください
+# Macの場合はDYDL_LIBRARY_PATH
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/libtorch/lib/" yarn example
 ```
 
