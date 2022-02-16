@@ -5,7 +5,6 @@
   "types": "index.d.ts",
   "license": "LGPL-3.0",
   "scripts": {
-    "preinstall": "node script/check-mac.js",
     "postinstall": "node script/download-dict.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

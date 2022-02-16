@@ -161,6 +161,14 @@
           {
             "libraries": [ "<(module_root_dir)/build/Release/openjtalk.a" ],
           }
+        ],
+        [
+          "OS=='mac'",
+          {
+            "xcode_settings": {
+              "GCC_ENABLE_CPP_EXCEPTIONS": "YES", # -fno-exceptions
+            }
+          }
         ]
       ]
     }
