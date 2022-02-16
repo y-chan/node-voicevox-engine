@@ -88,7 +88,7 @@ class Engine implements IEngine {
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     this.addon = new addon(
-      __dirname + '/open_jtalk_dic_utf_8-1.11',
+      __dirname + '/open_jtalk_dic_utf_8-1.11/',
       coreFilePath,
       useGpu,
       libraryRootDirPath
