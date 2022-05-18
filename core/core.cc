@@ -1,6 +1,6 @@
 #include "core.h"
 
-Core::Core(const std::string core_file_path, const std::string root_dir_path, bool use_gpu)
+Core::Core(const std::string core_file_path, bool use_gpu)
 {
     HMODULE handler = LoadLibrary(core_file_path.c_str());
     if (handler == nullptr) {
@@ -24,7 +24,7 @@ Core::Core(const std::string core_file_path, const std::string root_dir_path, bo
 	}
 	m_handler = handler;
     // TODO: make cpu_num_threads changeable
-    if (!initialize((char *)root_dir_path.c_str(), use_gpu, 0)) {
+    if (!initialize(use_gpu, 0, true)) {
         throw std::runtime_error("failed to initialize core library");
     }
 }

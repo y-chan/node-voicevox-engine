@@ -79,19 +79,16 @@ class Engine implements IEngine {
    * 読み込みに失敗した場合、エラーを投げるので、try-catchでのエラーハンドリングを推奨。
    * @param {string} coreFilePath - Coreライブラリのパス(絶対パス推奨)
    * @param {boolean} useGpu - GPUを使うか否か
-   * @param {string} libraryRootDirPath - 音声ライブラリデータ群が存在するフォルダのパス(絶対パス推奨)
    */
   constructor(
     coreFilePath: string,
-    useGpu: boolean,
-    libraryRootDirPath?: string
+    useGpu: boolean
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     this.addon = new addon(
       __dirname + '/open_jtalk_dic_utf_8-1.11/',
       coreFilePath,
-      useGpu,
-      libraryRootDirPath
+      useGpu
     )
   }
 

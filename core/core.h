@@ -16,7 +16,7 @@ typedef void* HMODULE;
 typedef void* FARPROC;
 #endif
 
-typedef bool (*INIT)(char *root_dir_path, bool use_gpu, int cpu_num_threads);
+typedef bool (*INIT)(bool use_gpu, int cpu_num_threads, bool load_all_models);
 typedef const char *(*RETURN_CHAR)();
 typedef bool (*YUKARIN_S)(int length, long *phoneme_list, long *speaker_id, float *output);
 typedef bool (*YUKARIN_SA)(
@@ -42,7 +42,7 @@ typedef bool (*DECODE)(
 
 class Core {
 public:
-    Core(const std::string core_file_path, std::string root_dir_path, bool use_gpu);
+    Core(const std::string core_file_path, bool use_gpu);
     ~Core();
 
     const char *metas();

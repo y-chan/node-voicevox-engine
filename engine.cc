@@ -57,32 +57,8 @@ EngineWrapper::EngineWrapper(const Napi::CallbackInfo& info)
     std::string openjtalk_dict = info[0].As<Napi::String>().Utf8Value();
     std::string core_file_path = info[1].As<Napi::String>().Utf8Value();
     bool use_gpu = info[2].As<Napi::Boolean>().Value();
-    std::string root_dir_path;
-    if (info[3].IsString()) {
-        root_dir_path = info[3].As<Napi::String>().Utf8Value();
-    } else {
-        std::vector<std::string> split_path;
-        std::string item;
-        for (char ch: core_file_path) {
-            if (ch == '/' || ch == '\\') {
-                if (!item.empty()) split_path.push_back(item);
-                item.clear();
-            } else {
-                item += ch;
-            }
-        }
-        if (!item.empty()) split_path.push_back(item);
-        // remove file name
-        split_path.pop_back();
-        if (core_file_path[0] == '/') {
-            root_dir_path = "/";
-        }
-        std::for_each(split_path.begin(), split_path.end(), [&](std::string path) {
-            root_dir_path += path + "/";
-        });
-    }
     try {
-        m_core = new Core(core_file_path, root_dir_path, use_gpu);
+        m_core = new Core(core_file_path, use_gpu);
         OpenJTalk* openjtalk = new OpenJTalk(openjtalk_dict);
         m_engine = new SynthesisEngine(m_core, openjtalk);
     }
