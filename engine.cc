@@ -6,23 +6,25 @@
 
 #include "engine.h"
 #include "engine/kana_parser.h"
+#include "engine/user_dict.h"
+#include "engine/nlohmann/json.hpp"
 
 using namespace Napi;
 
 Napi::Object EngineWrapper::NewInstance(Napi::Env env, const Napi::CallbackInfo& info)
 {
     Napi::EscapableHandleScope scope(env);
-    if (info.Length() < 3) {
+    if (info.Length() < 5) {
         Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
         return Napi::Object::New(env);
     }
 
-    if (!info[0].IsString() || !info[1].IsString() || !info[2].IsBoolean()) {
+    if (!info[0].IsString() || !info[1].IsString() || !info[2].IsString() || !info[3].IsString() || !info[4].IsBoolean()) {
         Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
         return Napi::Object::New(env);
     }
 
-    const std::initializer_list<napi_value> initArgList = { info[0], info[1], info[2], info[3] };
+    const std::initializer_list<napi_value> initArgList = { info[0], info[1], info[2], info[3], info[4] };
     Napi::Object obj = env.GetInstanceData<Napi::FunctionReference>()->New(initArgList);
     return scope.Escape(napi_value(obj)).ToObject();
 }
@@ -41,6 +43,10 @@ Napi::Object EngineWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("yukarin_s_forward", &EngineWrapper::yukarin_s_forward),
             InstanceMethod("yukarin_sa_forward", &EngineWrapper::yukarin_sa_forward),
             InstanceMethod("decode_forward", &EngineWrapper::decode_forward),
+            InstanceMethod("get_user_dict_words", &EngineWrapper::get_user_dict_words),
+            InstanceMethod("add_user_dict_word", &EngineWrapper::add_user_dict_word),
+            InstanceMethod("rewrite_user_dict_word", &EngineWrapper::rewrite_user_dict_word),
+            InstanceMethod("delete_user_dict_word", &EngineWrapper::delete_user_dict_word),
         });
 
     Napi::FunctionReference* constructor = new Napi::FunctionReference();
@@ -55,12 +61,20 @@ EngineWrapper::EngineWrapper(const Napi::CallbackInfo& info)
     : Napi::ObjectWrap<EngineWrapper>(info)
 {
     std::string openjtalk_dict = info[0].As<Napi::String>().Utf8Value();
-    std::string core_file_path = info[1].As<Napi::String>().Utf8Value();
-    bool use_gpu = info[2].As<Napi::Boolean>().Value();
+    std::string default_dict_path = info[1].As<Napi::String>().Utf8Value();
+    std::string user_dict_root = info[2].As<Napi::String>().Utf8Value();
+    std::string core_file_path = info[3].As<Napi::String>().Utf8Value();
+    bool use_gpu = info[4].As<Napi::Boolean>().Value();
     try {
         m_core = new Core(core_file_path, use_gpu);
-        OpenJTalk* openjtalk = new OpenJTalk(openjtalk_dict);
-        m_engine = new SynthesisEngine(m_core, openjtalk);
+        m_openjtalk = new OpenJTalk(openjtalk_dict);
+        std::string user_dict_path = user_dict_root + "user_dict.json";
+        std::string compiled_dict_path = user_dict_root + "user.dic";
+        m_openjtalk->default_dict_path = default_dict_path;
+        m_openjtalk->user_dict_path = user_dict_path;
+        m_openjtalk->user_mecab = compiled_dict_path;
+        user_dict_startup_processing(m_openjtalk);
+        m_engine = new SynthesisEngine(m_core, m_openjtalk);
     }
     catch (std::exception& err) {
         Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
@@ -447,6 +461,151 @@ Napi::Value EngineWrapper::decode_forward(const Napi::CallbackInfo& info)
     }
 
     return output_array;
+}
+
+Napi::Value EngineWrapper::get_user_dict_words(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    json user_dict = read_dict(m_openjtalk->user_dict_path);
+    Napi::Object result = Napi::Object::New(env);
+    for (auto &item : user_dict.items()) {
+        std::string key = item.key();
+        json value = item.value();
+        Napi::Object result_child = Napi::Object::New(env);
+        result_child.Set("surface", value["surface"].get<std::string>());
+        result_child.Set("priority", value["priority"].get<int>());
+        result_child.Set("context_id", value["context_id"].get<int>());
+        result_child.Set("part_of_speech", value["part_of_speech"].get<std::string>());
+        result_child.Set("part_of_speech_detail_1", value["part_of_speech_detail_1"].get<std::string>());
+        result_child.Set("part_of_speech_detail_2", value["part_of_speech_detail_2"].get<std::string>());
+        result_child.Set("part_of_speech_detail_3", value["part_of_speech_detail_3"].get<std::string>());
+        result_child.Set("inflectional_type", value["inflectional_type"].get<std::string>());
+        result_child.Set("inflectional_form", value["inflectional_form"].get<std::string>());
+        result_child.Set("stem", value["stem"].get<std::string>());
+        result_child.Set("yomi", value["yomi"].get<std::string>());
+        result_child.Set("pronunciation", value["pronunciation"].get<std::string>());
+        result_child.Set("accent_type", value["accent_type"].get<int>());
+        result_child.Set("mora_count", value["mora_count"].get<int>());
+        result_child.Set("accent_associative_rule", value["accent_associative_rule"].get<int>());
+        result[key] = result_child;
+    }
+    return result;
+}
+
+Napi::Value EngineWrapper::add_user_dict_word(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 3) {
+        Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (!info[0].IsString() || !info[1].IsString() || !info[2].IsNumber()) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (info.Length() >= 4 && !(info[3].IsUndefined() || info[3].IsString())) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (info.Length() >= 5 && !(info[4].IsUndefined() || info[4].IsNumber())) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    std::string surface = info[0].As<Napi::String>().Utf8Value();
+    std::string pronunciation = info[1].As<Napi::String>().Utf8Value();
+    int accent_type = info[2].As<Napi::Number>().Int32Value();
+    std::string *word_type = nullptr;
+    if (info[3].IsString()) {
+        std::string word_type_value = info[3].As<Napi::String>().Utf8Value();
+        word_type = &word_type_value;
+    }
+    int *priority = nullptr;
+    if (info[4].IsNumber()) {
+        int priority_value = info[4].As<Napi::Number>().Int32Value();
+        priority = &priority_value;
+    }
+    std::string word_uuid = apply_word(
+        m_openjtalk,
+        surface,
+        pronunciation,
+        accent_type,
+        word_type,
+        priority
+    );
+
+    return Napi::String::New(env, word_uuid);
+}
+
+Napi::Value EngineWrapper::rewrite_user_dict_word(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 4) {
+        Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (!info[0].IsString() || !info[1].IsString() || !info[2].IsNumber() || !info[3].IsString()) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (info.Length() >= 5 && !(info[4].IsUndefined() || info[4].IsString())) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (info.Length() == 6 && !(info[5].IsUndefined() || info[5].IsNumber())) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    std::string surface = info[0].As<Napi::String>().Utf8Value();
+    std::string pronunciation = info[1].As<Napi::String>().Utf8Value();
+    int accent_type = info[2].As<Napi::Number>().Int32Value();
+    std::string word_uuid = info[3].As<Napi::String>().Utf8Value();
+    std::string *word_type = nullptr;
+    if (info[4].IsString()) {
+        std::string word_type_value = info[4].As<Napi::String>().Utf8Value();
+        word_type = &word_type_value;
+    }
+    int *priority = nullptr;
+    if (info[5].IsNumber()) {
+        int priority_value = info[5].As<Napi::Number>().Int32Value();
+        priority = &priority_value;
+    }
+    rewrite_word(
+        m_openjtalk,
+        word_uuid,
+        surface,
+        pronunciation,
+        accent_type,
+        word_type,
+        priority
+    );
+
+    return env.Null();
+}
+
+Napi::Value EngineWrapper::delete_user_dict_word(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 1) {
+        Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (!info[0].IsString()) {
+        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    std::string word_uuid = info[0].As<Napi::String>().Utf8Value();
+    delete_word(
+        m_openjtalk,
+        word_uuid
+    );
+
+    return env.Null();
 }
 
 Napi::Object CreateObject(const Napi::CallbackInfo& info) {

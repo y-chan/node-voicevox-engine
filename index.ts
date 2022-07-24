@@ -1,6 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 const addon = require('bindings')('engine')
 
+import fs from 'fs'
+
 export interface Mora {
   text: string
   consonant?: string
@@ -28,6 +30,31 @@ export interface AudioQuery {
   outputStereo: boolean
   kana: string
 }
+
+export interface UserDictWord {
+  surface: string
+  priority: number
+  context_id: number
+  part_of_speech: string
+  part_of_speech_detail_1: string
+  part_of_speech_detail_2: string
+  part_of_speech_detail_3: string
+  inflectional_type: string
+  inflectional_form: string
+  stem: string
+  yomi: string
+  pronuciation: string
+  accent_type: number
+  mora_count?: number
+  accent_associative_rule: string
+}
+
+export type WordTypes =
+  | 'PROPER_NOUN'
+  | 'COMMON_NOUN'
+  | 'VERB'
+  | 'ADJECTIVE'
+  | 'SUFFIX'
 
 interface IEngine {
   audio_query(text: string, speaker_id: number): AudioQuery
@@ -63,6 +90,23 @@ interface IEngine {
     phoneme: number[][],
     speaker_id: number
   ): number[]
+  get_user_dict_words(): Record<string, UserDictWord>
+  add_user_dict_word(
+    surface: string,
+    pronunciation: string,
+    accent_type: number,
+    word_type?: WordTypes,
+    priority?: number
+  ): string
+  rewrite_user_dict_word(
+    surface: string,
+    pronunciation: string,
+    accent_type: number,
+    word_uuid: string,
+    word_type?: WordTypes,
+    priority?: number
+  ): void
+  delete_user_dict_word(word_uuid: string): void
 }
 
 /**
@@ -80,13 +124,16 @@ class Engine implements IEngine {
    * @param {string} coreFilePath - Coreライブラリのパス(絶対パス推奨)
    * @param {boolean} useGpu - GPUを使うか否か
    */
-  constructor(
-    coreFilePath: string,
-    useGpu: boolean
-  ) {
+  constructor(coreFilePath: string, useGpu: boolean) {
+    const user_dict_root = __dirname + '/user_dict/'
+    if (!fs.existsSync(user_dict_root)) {
+      fs.mkdirSync(user_dict_root)
+  }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     this.addon = new addon(
       __dirname + '/open_jtalk_dic_utf_8-1.11/',
+      __dirname + '/default.csv',
+      user_dict_root,
       coreFilePath,
       useGpu
     )
@@ -239,6 +286,74 @@ class Engine implements IEngine {
     speaker_id: number
   ): number[] {
     return this.addon.decode_forward(f0, phoneme, speaker_id)
+  }
+
+  /**
+   * ユーザー辞書に登録されている単語の一覧を返します。
+   * @return {Record<string, UserDictWord>} - 単語のUUIDとその詳細
+   */
+  get_user_dict_words(): Record<string, UserDictWord> {
+    return this.addon.get_user_dict_words()
+  }
+
+  /**
+   * ユーザー辞書に言葉を追加します。
+   * @param {string} surface - 言葉の表層形
+   * @param {string} pronunciation - 言葉の発音（カタカナ）
+   * @param {number} accent_type - アクセント型（音が下がる場所を指す）
+   * @param {WordTypes} word_type - 単語の形式
+   * @param {number} priority - 単語の優先度（0から10までの整数）、数字が大きいほど優先度が高くなる
+   * @return {string} - 単語のUUID
+   */
+  add_user_dict_word(
+    surface: string,
+    pronunciation: string,
+    accent_type: number,
+    word_type?: WordTypes,
+    priority?: number
+  ): string {
+    return this.addon.add_user_dict_word(
+      surface,
+      pronunciation,
+      accent_type,
+      word_type,
+      priority
+    )
+  }
+
+  /**
+   * ユーザー辞書に登録されている言葉を更新します。
+   * @param {string} surface - 言葉の表層形
+   * @param {string} pronunciation - 言葉の発音（カタカナ）
+   * @param {number} accent_type - アクセント型（音が下がる場所を指す）
+   * @param {string} word_uuid - 更新する言葉のUUID
+   * @param {WordTypes} word_type - 単語の形式
+   * @param {number} priority - 単語の優先度（0から10までの整数）、数字が大きいほど優先度が高くなる
+   */
+  rewrite_user_dict_word(
+    surface: string,
+    pronunciation: string,
+    accent_type: number,
+    word_uuid: string,
+    word_type?: WordTypes,
+    priority?: number
+  ): void {
+    this.addon.rewrite_user_dict_word(
+      surface,
+      pronunciation,
+      accent_type,
+      word_uuid,
+      word_type,
+      priority
+    )
+  }
+
+  /**
+   * ユーザー辞書に登録されている言葉を削除します。
+   * @param {string} word_uuid - 削除する言葉のUUID
+   */
+  delete_user_dict_word(word_uuid: string): void {
+    this.addon.delete_user_dict_word(word_uuid)
   }
 }
 

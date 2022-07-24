@@ -107,6 +107,8 @@
         "core/core.cc",
         "core/core.h",
         "engine/nlohmann/json.hpp",
+        "engine/uuid/endianness.h",
+        "engine/uuid/uuid_v4.h",
         "engine/acoustic_feature_extractor.cc",
         "engine/acoustic_feature_extractor.h",
         "engine/full_context_label.cc",
@@ -119,7 +121,9 @@
         "engine/openjtalk.h",
         "engine/part_of_speech_data.h",
         "engine/synthesis_engine.cc",
-        "engine/synthesis_engine.h"
+        "engine/synthesis_engine.h",
+        "engine/user_dict.cc",
+        "engine/user_dict.h"
       ],
       "dependencies": ["openjtalk"],
       "include_dirs": [

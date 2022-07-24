@@ -28,10 +28,16 @@ public:
     Napi::Value yukarin_sa_forward(const Napi::CallbackInfo& info);
     Napi::Value decode_forward(const Napi::CallbackInfo& info);
 
+    Napi::Value get_user_dict_words(const Napi::CallbackInfo& info);
+    Napi::Value add_user_dict_word(const Napi::CallbackInfo& info);
+    Napi::Value rewrite_user_dict_word(const Napi::CallbackInfo& info);
+    Napi::Value delete_user_dict_word(const Napi::CallbackInfo& info);
+
 private:
     void create_execute_error(Napi::Env env, const char* func_name);
 
     Core* m_core;
+    OpenJTalk* m_openjtalk;
     SynthesisEngine* m_engine;
 };
 
