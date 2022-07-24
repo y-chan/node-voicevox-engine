@@ -40,7 +40,8 @@
     "script",
     "engine.cc",
     "engine.h",
-    "binding.gyp"
+    "binding.gyp",
+    "default.csv"
   ],
   "dependencies": {
     "bindings": "^1.5.0",
