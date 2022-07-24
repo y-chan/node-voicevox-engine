@@ -50,6 +50,23 @@ static const std::map<std::string, Napi::Object> text2mora_with_unvoice() {
     return text2mora_with_unvoice;
 }
 
+std::string extract_one_character(const std::string& text, size_t pos, size_t& size) {
+    // UTF-8の文字は可変長なので、leadの値で長さを判別する
+    unsigned char lead = text[pos];
+
+    if (lead < 0x80) {
+        size = 1;
+    } else if (lead < 0xE0) {
+        size = 2;
+    } else if (lead < 0xF0) {
+        size = 3;
+    } else {
+        size = 4;
+    }
+
+    return text.substr(pos, size);
+}
+
 Napi::Object text_to_accent_phrase(Napi::Env env, std::string phrase) {
     int* accent_index = nullptr;
 
@@ -65,7 +82,9 @@ Napi::Object text_to_accent_phrase(Napi::Env env, std::string phrase) {
     int outer_loop = 0;
     while (base_index < phrase.size()) {
         outer_loop++;
-        if (std::string(&phrase[base_index]) == ACCENT_SYMBOL) {
+        size_t char_size;
+        std::string letter = extract_one_character(phrase, base_index, char_size);
+        if (letter == ACCENT_SYMBOL) {
             if (moras.Length() == 0) {
                 throw std::runtime_error("accent cannot be set at beginning of accent phrase: " + phrase);
             }
@@ -77,7 +96,9 @@ Napi::Object text_to_accent_phrase(Napi::Env env, std::string phrase) {
             base_index++;
             continue;
         }
-        for (int watch_index = base_index; watch_index < phrase.size(); watch_index++) {
+        size_t watch_char_size;
+        for (size_t watch_index = base_index; watch_index < phrase.size(); watch_index += watch_char_size) {
+            std::string watch_letter = extract_one_character(phrase, watch_index, watch_char_size);
             if (std::string(&phrase[base_index]) == ACCENT_SYMBOL) break;
             stack += phrase[watch_index];
             if (text2mora.find(stack) != text2mora.end()) {
@@ -108,10 +129,13 @@ Napi::Array parse_kana(Napi::Env env, std::string text) {
 
     std::string phrase = "";
     int count = 0;
-    for (size_t i = 0; i <= text.size(); i++) {
-        std::string letter = i == text.size() ? "" : &text[i];
-        phrase += letter;
-        if (i == text.size() || letter == PAUSE_DELIMITER || letter == NOPAUSE_DELIMITER) {
+    size_t char_size;
+    for (size_t pos = 0; pos <= text.size(); pos += char_size) {
+        std::string letter;
+        if (pos != text.size()) {
+            letter = extract_one_character(text, pos, char_size);
+        }
+        if (pos == text.size() || letter == PAUSE_DELIMITER || letter == NOPAUSE_DELIMITER) {
             if (phrase.size() == 0) {
                 throw std::runtime_error(
                     "accent phrase at position of " + std::to_string(parsed_results.Length() + 1) +" is empty"
@@ -127,7 +151,7 @@ Napi::Array parse_kana(Napi::Env env, std::string text) {
                 phrase = phrase.replace(phrase.length() - 1, 1, "");
             }
             Napi::Object accent_phrase = text_to_accent_phrase(env, phrase);
-            if (i < text.size() && letter == PAUSE_DELIMITER) {
+            if (pos < text.size() && letter == PAUSE_DELIMITER) {
                 Napi::Object pause_mora = Napi::Object::New(env);
                 pause_mora.Set("text", PAUSE_DELIMITER);
                 pause_mora.Set("vowel", "pau");
@@ -140,8 +164,9 @@ Napi::Array parse_kana(Napi::Env env, std::string text) {
             parsed_results[count] = accent_phrase;
             count++;
             phrase = "";
+        } else {
+            phrase += letter;
         }
-        
     }
     return parsed_results;
 }
