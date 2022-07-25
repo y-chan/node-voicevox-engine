@@ -1,8 +1,10 @@
 #include <algorithm>
 #include <iostream>
+#include <regex>
 
 #include "uuid/uuid_v4.h"
 #include "user_dict.h"
+#include "kana_parser.h"
 #include "part_of_speech_data.h"
 
 void write_to_json(json user_dict, std::string user_dict_path) {
@@ -118,6 +120,39 @@ json create_word(std::string surface, std::string pronunciation, int accent_type
     int priority_num = priority != nullptr ? *priority : 5;
     if (!(USER_DICT_MIN_PRIORITY <= priority_num && priority_num <= USER_DICT_MAX_PRIORITY)) {
         throw std::runtime_error("invalid priority");
+    }
+
+    // hankaku to zenkaku
+    // replace !(exclamation mark) to ~(tilde)
+    for (int i = 0; i < 94; i++) {
+        std::vector<unsigned char> hankaku{ (unsigned char)(0x21 + i) };
+        std::vector<unsigned char> zenkaku;
+        if (i < 63) zenkaku = { 0xEF, 0xBC, (unsigned char)(0x81 + i) };
+        else zenkaku = { 0xEF, 0xBD, (unsigned char)(0x80 + i - 63) };
+
+        std::string hankaku_str((char *)hankaku.data(), hankaku.size());
+        std::string zenkaku_str((char *)zenkaku.data(), zenkaku.size());
+        // 正規表現に使われる文字列はエスケープする
+        if (
+            hankaku_str == "$" ||
+            hankaku_str == "(" ||
+            hankaku_str == ")" ||
+            hankaku_str == "*" ||
+            hankaku_str == "+" ||
+            hankaku_str == "-" ||
+            hankaku_str == "." ||
+            hankaku_str == "?" ||
+            hankaku_str == "[" ||
+            hankaku_str == "\\" ||
+            hankaku_str == "]" ||
+            hankaku_str == "^" ||
+            hankaku_str == "{" ||
+            hankaku_str == "|" ||
+            hankaku_str == "}"
+        ) {
+            hankaku_str = "\\" + hankaku_str;
+        }
+        surface = std::regex_replace(surface, std::regex(hankaku_str), zenkaku_str);
     }
 
     json pos_detail = part_of_speech_data[word_type_str];
