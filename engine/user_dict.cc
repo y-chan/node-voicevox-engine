@@ -155,6 +155,48 @@ json create_word(std::string surface, std::string pronunciation, int accent_type
         surface = std::regex_replace(surface, std::regex(hankaku_str), zenkaku_str);
     }
 
+    // check pronunciation
+    std::regex all_katakana(R"(^[ァ-ヴー]+$)");
+    if (std::regex_match(pronunciation, all_katakana)) {
+        throw std::runtime_error("invalid pronunciation, pronunciation must be katakana");
+    }
+    std::vector<std::string> sute_gana{"ァ", "ィ", "ゥ", "ェ", "ォ", "ャ", "ュ", "ョ", "ヮ", "ッ"};
+    std::vector<std::string> sute_gana_without_sokuon{"ァ", "ィ", "ゥ", "ェ", "ォ", "ャ", "ュ", "ョ", "ヮ"};
+    std::vector<std::string> small_wa_before{"ク", "グ"};
+
+    size_t char_size;
+    std::string before_letter;
+    for (size_t pos = 0; pos < pronunciation.size(); pos += char_size) {
+        std::string letter = extract_one_character(pronunciation, pos, char_size);
+        if (std::find(sute_gana.begin(), sute_gana.end(), letter) != sute_gana.end()) {
+            // 「キャット」のように、捨て仮名が連続する可能性が考えられるので、
+            // 「ッ」に関しては「ッ」そのものが連続している場合と、「ッ」の後にほかの捨て仮名が連続する場合のみ無効とする
+            if (pos < pronunciation.size() - 1) {
+                size_t next_char_size;
+                std::string next_letter = extract_one_character(pronunciation, pos + char_size, next_char_size);
+                if (
+                    std::find(
+                        sute_gana_without_sokuon.begin(),
+                        sute_gana_without_sokuon.end(),
+                        next_letter
+                    ) != sute_gana_without_sokuon.end() ||
+                    (
+                        letter == sute_gana[sute_gana.size() - 1] &&
+                        next_letter == sute_gana[sute_gana.size() - 1]
+                    )
+                ) {
+                    throw std::runtime_error("invalid pronunciation (continuous sute gana)");
+                }
+            }
+            if (letter == "ヮ") {
+                if (pos != 0 && std::find(small_wa_before.begin(), small_wa_before.end(), before_letter) != small_wa_before.end()) {
+                    throw std::runtime_error("invalid pronunciation (other than kuwa/guwa)");
+                }
+            }
+        }
+        before_letter = letter;
+    }
+
     json pos_detail = part_of_speech_data[word_type_str];
     json result = {
         { "surface", surface },
