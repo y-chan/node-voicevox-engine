@@ -465,7 +465,13 @@ Napi::Value EngineWrapper::decode_forward(const Napi::CallbackInfo& info)
 
 Napi::Value EngineWrapper::get_user_dict_words(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    json user_dict = read_dict(m_openjtalk->user_dict_path);
+    json user_dict;
+    try {
+        user_dict = read_dict(m_openjtalk->user_dict_path);
+    } catch (std::exception& err) {
+        Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
+        return env.Null();
+    }
     Napi::Object result = Napi::Object::New(env);
     for (auto &item : user_dict.items()) {
         std::string key = item.key();
@@ -528,14 +534,20 @@ Napi::Value EngineWrapper::add_user_dict_word(const Napi::CallbackInfo& info) {
         priority_value = info[4].As<Napi::Number>().Int32Value();
         priority = &priority_value;
     }
-    std::string word_uuid = apply_word(
-        m_openjtalk,
-        surface,
-        pronunciation,
-        accent_type,
-        word_type,
-        priority
-    );
+    std::string word_uuid;
+    try {
+        word_uuid = apply_word(
+            m_openjtalk,
+            surface,
+            pronunciation,
+            accent_type,
+            word_type,
+            priority
+        );
+    } catch (std::exception& err) {
+        Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
+        return env.Null();
+    }
 
     return Napi::String::New(env, word_uuid);
 }
@@ -578,15 +590,20 @@ Napi::Value EngineWrapper::rewrite_user_dict_word(const Napi::CallbackInfo& info
         priority_value = info[5].As<Napi::Number>().Int32Value();
         priority = &priority_value;
     }
-    rewrite_word(
-        m_openjtalk,
-        word_uuid,
-        surface,
-        pronunciation,
-        accent_type,
-        word_type,
-        priority
-    );
+    try {
+        rewrite_word(
+            m_openjtalk,
+            word_uuid,
+            surface,
+            pronunciation,
+            accent_type,
+            word_type,
+            priority
+        );
+    } catch (std::exception& err) {
+        Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
+        return env.Null();
+    }
 
     return env.Null();
 }
@@ -604,10 +621,15 @@ Napi::Value EngineWrapper::delete_user_dict_word(const Napi::CallbackInfo& info)
     }
 
     std::string word_uuid = info[0].As<Napi::String>().Utf8Value();
-    delete_word(
-        m_openjtalk,
-        word_uuid
-    );
+    try {
+        delete_word(
+            m_openjtalk,
+            word_uuid
+        );
+    } catch (std::exception& err) {
+        Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
+        return env.Null();
+    }
 
     return env.Null();
 }
