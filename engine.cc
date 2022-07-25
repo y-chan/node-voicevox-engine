@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <string>
-#include <iostream>
 
 #include "engine.h"
 #include "engine/kana_parser.h"
@@ -301,7 +300,6 @@ Napi::Value EngineWrapper::yukarin_s_forward(const Napi::CallbackInfo& info)
     for (int i = 0; i < length; i++) {
         Napi::Value val = info[0].As<Napi::Array>()[i];
         phoneme_list[i] = (long)val.As<Napi::Number>().Int64Value();
-        std::cout << phoneme_list[i] << std::endl;
     }
 
     long speaker_id = info[1].As<Napi::Number>().Int64Value();
