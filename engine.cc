@@ -517,13 +517,15 @@ Napi::Value EngineWrapper::add_user_dict_word(const Napi::CallbackInfo& info) {
     std::string pronunciation = info[1].As<Napi::String>().Utf8Value();
     int accent_type = info[2].As<Napi::Number>().Int32Value();
     std::string *word_type = nullptr;
+    std::string word_type_value;
     if (info[3].IsString()) {
-        std::string word_type_value = info[3].As<Napi::String>().Utf8Value();
+        word_type_value = info[3].As<Napi::String>().Utf8Value();
         word_type = &word_type_value;
     }
     int *priority = nullptr;
+    int priority_value;
     if (info[4].IsNumber()) {
-        int priority_value = info[4].As<Napi::Number>().Int32Value();
+        priority_value = info[4].As<Napi::Number>().Int32Value();
         priority = &priority_value;
     }
     std::string word_uuid = apply_word(
@@ -565,13 +567,15 @@ Napi::Value EngineWrapper::rewrite_user_dict_word(const Napi::CallbackInfo& info
     int accent_type = info[2].As<Napi::Number>().Int32Value();
     std::string word_uuid = info[3].As<Napi::String>().Utf8Value();
     std::string *word_type = nullptr;
+    std::string word_type_value;
     if (info[4].IsString()) {
-        std::string word_type_value = info[4].As<Napi::String>().Utf8Value();
+        word_type_value = info[4].As<Napi::String>().Utf8Value();
         word_type = &word_type_value;
     }
     int *priority = nullptr;
+    int priority_value;
     if (info[5].IsNumber()) {
-        int priority_value = info[5].As<Napi::Number>().Int32Value();
+        priority_value = info[5].As<Napi::Number>().Int32Value();
         priority = &priority_value;
     }
     rewrite_word(
