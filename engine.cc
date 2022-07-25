@@ -491,7 +491,7 @@ Napi::Value EngineWrapper::get_user_dict_words(const Napi::CallbackInfo& info) {
         result_child.Set("pronunciation", value["pronunciation"].get<std::string>());
         result_child.Set("accent_type", value["accent_type"].get<int>());
         result_child.Set("mora_count", value["mora_count"].get<int>());
-        result_child.Set("accent_associative_rule", value["accent_associative_rule"].get<int>());
+        result_child.Set("accent_associative_rule", value["accent_associative_rule"].get<std::string>());
         result[key] = result_child;
     }
     return result;
