@@ -161,7 +161,7 @@ Napi::Array parse_kana(Napi::Env env, std::string text) {
                 accent_phrase.Set("pause_mora", pause_mora);
             }
             accent_phrase.Set("is_interrogative", is_interrogative);
-            parsed_results[count] = accent_phrase;
+            parsed_results.Set(count, accent_phrase);
             count++;
             phrase = "";
         } else {
