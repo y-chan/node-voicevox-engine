@@ -68,14 +68,14 @@ std::string extract_one_character(const std::string& text, size_t pos, size_t& s
 }
 
 Napi::Object text_to_accent_phrase(Napi::Env env, std::string phrase) {
-    int* accent_index = nullptr;
+    int accent_index = 0;
 
     Napi::Array moras = Napi::Array::New(env);
     int count = 0;
 
     int base_index = 0;
     std::string stack = "";
-    std::string *matched_text = nullptr;
+    std::string matched_text;
 
     const std::map<std::string, Napi::Object> text2mora = text2mora_with_unvoice(env);
 
@@ -88,39 +88,39 @@ Napi::Object text_to_accent_phrase(Napi::Env env, std::string phrase) {
             if (moras.Length() == 0) {
                 throw std::runtime_error("accent cannot be set at beginning of accent phrase: " + phrase);
             }
-            if (accent_index == nullptr) {
+            if (accent_index != 0) {
                 throw std::runtime_error("second accent cannot be set at an accent phrase: " + phrase);
             }
 
-            *accent_index = moras.Length();
-            base_index++;
+            accent_index = moras.Length();
+            base_index += char_size;
             continue;
         }
         size_t watch_char_size;
         for (size_t watch_index = base_index; watch_index < phrase.size(); watch_index += watch_char_size) {
             std::string watch_letter = extract_one_character(phrase, watch_index, watch_char_size);
-            if (std::string(&phrase[base_index]) == ACCENT_SYMBOL) break;
-            stack += phrase[watch_index];
+            if (watch_letter == ACCENT_SYMBOL) break;
+            stack += watch_letter;
             if (text2mora.find(stack) != text2mora.end()) {
-                matched_text = &stack;
+                matched_text = stack;
             }
         }
-        if (matched_text == nullptr) {
+        if (matched_text.empty()) {
             throw std::runtime_error("unknown text in accent phrase: " + stack);
         } else {
-            moras[count] = text2mora.at(*matched_text);
+            moras.Set(count, text2mora.at(matched_text));
             count++;
-            base_index += matched_text->size();
+            base_index += matched_text.size();
             stack = "";
-            matched_text = nullptr;
+            matched_text = "";
         }
         if (outer_loop > LOOP_LIMIT) throw std::runtime_error("detect infinity loop!");
     }
-    if (accent_index == nullptr) throw std::runtime_error("accent not found in accent phrase: " + phrase);
+    if (accent_index == 0) throw std::runtime_error("accent not found in accent phrase: " + phrase);
 
     Napi::Object accent_phrase = Napi::Object::New(env);
     accent_phrase.Set("moras", moras);
-    accent_phrase.Set("accent", *accent_index);
+    accent_phrase.Set("accent", accent_index);
     return accent_phrase;
 }
 
