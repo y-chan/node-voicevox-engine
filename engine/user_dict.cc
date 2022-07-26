@@ -87,12 +87,11 @@ void update_dict(OpenJTalk *openjtalk) {
 
 json read_dict(std::string user_dict_path) {
     std::ifstream user_dict_file(user_dict_path);
-    std::string user_dict;
-
     if (!user_dict_file) {
         return json::object();
     }
-    user_dict_file >> user_dict;
+
+    std::string user_dict((std::istreambuf_iterator<char>(user_dict_file)), std::istreambuf_iterator<char>());
     json user_dict_json = json::parse(user_dict);
 
     for (auto &item : user_dict_json.items()) {
