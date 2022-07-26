@@ -8,7 +8,7 @@
 #include "part_of_speech_data.h"
 
 void write_to_json(json user_dict, std::string user_dict_path) {
-    json converted_user_dict;
+    json converted_user_dict = json::object();
     for (auto& word : user_dict.items()) {
         std::string word_uuid = word.key();
         json word_dict = word.value();
