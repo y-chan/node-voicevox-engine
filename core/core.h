@@ -38,6 +38,7 @@ typedef bool (*DECODE)(
     long *speaker_id,
     float *output
 );
+typedef void (*FINAL)();
 
 
 class Core {
@@ -71,6 +72,8 @@ public:
     );
 
     const char *last_error_message();
+
+    void finalize();
 
 private:
     HMODULE m_handler;

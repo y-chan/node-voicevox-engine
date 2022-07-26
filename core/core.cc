@@ -12,13 +12,15 @@ Core::Core(const std::string core_file_path, bool use_gpu)
 	FARPROC yukarin_sa_forward = GetProcAddress(handler, "yukarin_sa_forward");
 	FARPROC decode_forward = GetProcAddress(handler, "decode_forward");
 	FARPROC last_error_message = GetProcAddress(handler, "last_error_message");
+    FARPROC finalize = GetProcAddress(handler, "finalize");
 	if (
 		initialize == nullptr ||
 		metas == nullptr ||
 		yukarin_s_forward == nullptr ||
 		yukarin_sa_forward == nullptr ||
 		decode_forward == nullptr ||
-		last_error_message == nullptr
+		last_error_message == nullptr ||
+        finalize == nullptr
 	) {
 		throw std::runtime_error("to load library is succeeded, but can't found needed functions");
 	}
@@ -96,4 +98,10 @@ const char *Core::last_error_message()
 {
 	RETURN_CHAR last_error_message = (RETURN_CHAR)GetProcAddress(m_handler, "last_error_message");
 	return last_error_message();
+}
+
+void Core::finalize()
+{
+    FINAL finalize = (FINAL)GetProcAddress(m_handler, "finalize");
+    finalize();
 }

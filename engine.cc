@@ -83,6 +83,7 @@ EngineWrapper::EngineWrapper(const Napi::CallbackInfo& info)
 
 EngineWrapper::~EngineWrapper()
 {
+    m_core->finalize();
     delete m_core;
     m_core = nullptr;
 }
