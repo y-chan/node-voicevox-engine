@@ -16,7 +16,7 @@ const std::string NOPAUSE_DELIMITER = "/";
 const std::string PAUSE_DELIMITER = "、";
 const std::string WIDE_INTERROGATION_MARK = "？";
 
-static const std::map<std::string, Napi::Object> text2mora_with_unvoice();
+static const std::map<std::string, Napi::Object> text2mora_with_unvoice(Napi::Env env);
 std::string extract_one_character(const std::string& text, size_t pos, size_t& size);
 
 Napi::Object text_to_accent_phrase(Napi::Env env, std::string phrase);

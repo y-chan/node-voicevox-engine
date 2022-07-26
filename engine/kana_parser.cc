@@ -1,6 +1,6 @@
 #include "kana_parser.h"
 
-static const std::map<std::string, Napi::Object> text2mora_with_unvoice() {
+static const std::map<std::string, Napi::Object> text2mora_with_unvoice(Napi::Env env) {
     std::map<std::string, Napi::Object> text2mora_with_unvoice;
     const std::string* mora_list = mora_list_minimum.data();
     int count = 0;
@@ -9,7 +9,7 @@ static const std::map<std::string, Napi::Object> text2mora_with_unvoice() {
         std::string consonant = *(mora_list + 1);
         std::string vowel = *(mora_list + 2);
 
-        Napi::Object mora;
+        Napi::Object mora = Napi::Object::New(env);
         mora.Set("text", text);
         if (consonant.size() != 0) {
             mora.Set("consonant", consonant);
@@ -28,7 +28,7 @@ static const std::map<std::string, Napi::Object> text2mora_with_unvoice() {
             vowel == "e" ||
             vowel == "o"
         ) {
-            Napi::Object unvoice_mora;
+            Napi::Object unvoice_mora = Napi::Object::New(env);
             unvoice_mora.Set("text", text);
             if (consonant.size() != 0) {
                 unvoice_mora.Set("consonant", consonant);
@@ -77,7 +77,7 @@ Napi::Object text_to_accent_phrase(Napi::Env env, std::string phrase) {
     std::string stack = "";
     std::string *matched_text = nullptr;
 
-    const std::map<std::string, Napi::Object> text2mora = text2mora_with_unvoice();
+    const std::map<std::string, Napi::Object> text2mora = text2mora_with_unvoice(env);
 
     int outer_loop = 0;
     while (base_index < phrase.size()) {
