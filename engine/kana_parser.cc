@@ -143,12 +143,12 @@ Napi::Array parse_kana(Napi::Env env, std::string text) {
             }
             bool is_interrogative = phrase.find(WIDE_INTERROGATION_MARK) != std::string::npos;
             if (is_interrogative) {
-                if (phrase.find(WIDE_INTERROGATION_MARK) != phrase.length() - 1) {
+                if (phrase.find(WIDE_INTERROGATION_MARK) != phrase.size() - char_size) {
                     throw std::runtime_error(
                         "interrogative mark cannot be set at not end of accent phrase: " + phrase
                     );
                 }
-                phrase = phrase.replace(phrase.length() - 1, 1, "");
+                phrase = phrase.replace(phrase.length() - char_size, char_size, "");
             }
             Napi::Object accent_phrase = text_to_accent_phrase(env, phrase);
             if (pos < text.size() && letter == PAUSE_DELIMITER) {
