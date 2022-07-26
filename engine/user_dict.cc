@@ -155,7 +155,7 @@ json create_word(std::string surface, std::string pronunciation, int accent_type
         surface = std::regex_replace(surface, std::regex(hankaku_str), zenkaku_str);
     }
 
-    // check pronunciation
+    // check pronunciation & mora count
     std::regex all_katakana(R"(^[ァ-ヴー]+$)");
     if (std::regex_match(pronunciation, all_katakana)) {
         throw std::runtime_error("invalid pronunciation, pronunciation must be katakana");
@@ -164,6 +164,7 @@ json create_word(std::string surface, std::string pronunciation, int accent_type
     std::vector<std::string> sute_gana_without_sokuon{"ァ", "ィ", "ゥ", "ェ", "ォ", "ャ", "ュ", "ョ", "ヮ"};
     std::vector<std::string> small_wa_before{"ク", "グ"};
 
+    int mora_count = 0;
     size_t char_size;
     std::string before_letter;
     for (size_t pos = 0; pos < pronunciation.size(); pos += char_size) {
@@ -188,13 +189,22 @@ json create_word(std::string surface, std::string pronunciation, int accent_type
                     throw std::runtime_error("invalid pronunciation (continuous sute gana)");
                 }
             }
+            // 文字が捨て仮名でも、「ッ」であればカウント
+            if (letter == sute_gana[sute_gana.size() - 1]) mora_count++;
             if (letter == "ヮ") {
                 if (pos != 0 && std::find(small_wa_before.begin(), small_wa_before.end(), before_letter) != small_wa_before.end()) {
                     throw std::runtime_error("invalid pronunciation (other than kuwa/guwa)");
                 }
             }
+        } else {
+            // 文字が捨て仮名でなければカウント
+            mora_count++;
         }
         before_letter = letter;
+    }
+
+    if (!(0 <= accent_type && accent_type <= mora_count)) {
+        throw std::runtime_error("accent type is wrong");
     }
 
     json pos_detail = part_of_speech_data[word_type_str];
@@ -211,6 +221,7 @@ json create_word(std::string surface, std::string pronunciation, int accent_type
         { "stem", "*" },
         { "yomi", pronunciation },
         { "pronunciation", pronunciation },
+        { "mora_count", mora_count },
         { "accent_type", accent_type },
         { "accent_associative_rule", "*" },
     };
