@@ -60,8 +60,8 @@ void update_dict(OpenJTalk *openjtalk) {
             word["stem"].get<std::string>() + "," +
             word["yomi"].get<std::string>() + "," +
             word["pronunciation"].get<std::string>() + "," +
-            std::to_string(word["accent_type"].get<int>()) + "," +
-            (word.count("mora_count") >= 1 ? std::to_string(word["mora_count"].get<int>()) : "") + "," +
+            std::to_string(word["accent_type"].get<int>()) + "/" +
+            std::to_string(word["mora_count"].get<int>()) + "," +
             word["accent_associative_rule"].get<std::string>() + "\n"
         );
         temp_file << word_info;
