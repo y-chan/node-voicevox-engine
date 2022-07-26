@@ -5,13 +5,14 @@
 
 ## 本ライブラリについて
 本ライブラリは[ヒホ氏](https://github.com/Hiroshiba)によって制作・公開されている、
-[VOICEVOX Engine](https://github.com/Hiroshiba/voicevox_engine)の**非公式**Node.js版、兼
-[VOICEVOX Core](https://github.com/Hiroshiba/voicevox_core)のラッパーライブラリです。
+[VOICEVOX Engine](https://github.com/VOICEVOX/voicevox_engine)の**非公式**Node.js版、兼
+[VOICEVOX Core](https://github.com/VOICEVOX/voicevox_core)のラッパーライブラリです。
 
 ## 使用にあたって
-本ライブラリの使用にあたっては、利用者自身が[VOICEVOX Core公開のサイト](https://github.com/Hiroshiba/voicevox_core/releases/latest)より、
+本ライブラリの使用にあたっては、利用者自身が[VOICEVOX Core公開のサイト](https://github.com/VOICEVOX/voicevox_core/releases/latest)より、
 VOICEVOX Coreライブラリをダウンロードし、そのライブラリのパスを指定しなければなりません。
-[加えてONNX RuntimeやCUDAなどのインストール](https://github.com/Hiroshiba/voicevox_core#%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82)も必要です。
+加えて[ONNX Runtime](https://github.com/microsoft/onnxruntime/releases/tag/v1.10.0)も必要です。
+(Raspberry Pi等を用いる場合、[VOICEVOX公式が公開するarm64/armhf向けビルド](https://github.com/VOICEVOX/onnxruntime-builder/releases/tag/1.10.0.1)をご利用ください。)
 本ライブラリのみで完結はしませんのでご注意ください。
 なお、CPU版を利用する場合はCUDA/CUDNNは必要ありません。
 
@@ -30,9 +31,9 @@ VOICEVOX Coreライブラリをダウンロードし、そのライブラリの�
 # npm なら npm install
 yarn inatall
 # 実行する。npm なら npm start
-# libtorchの存在する場所によってパスを適切に変更してください
+# onnxruntimeの存在する場所によってパスを適切に変更してください
 # Macの場合はDYDL_LIBRARY_PATH
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/libtorch/lib/" yarn start
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/onnxruntime/lib/" yarn start
 ```
 
 
@@ -45,11 +46,11 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/libtorch/lib/" yarn start
 # npm なら npm install
 yarn inatall
 # 実行する。npm なら npm run example
-# libtorchの存在する場所によってパスを適切に変更してください
+# onnxruntimeの存在する場所によってパスを適切に変更してください
 # Macの場合はDYDL_LIBRARY_PATH
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/libtorch/lib/" yarn example
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/onnxruntime/lib/" yarn example
 ```
 
 ## ライセンス
-本ライブラリは、[本家VOICEVOX Engine](https://github.com/Hiroshiba/voicevox_engine)のライセンスを継承し、
+本ライブラリは、[本家VOICEVOX Engine](https://github.com/VOICEVOX/voicevox_engine)のライセンスを継承し、
 [LGPL-3.0](LICENSE)でライセンスされています。
