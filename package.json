@@ -1,6 +1,6 @@
 {
   "name": "node-voicevox-engine",
-  "version": "0.1.7",
+  "version": "0.2.1",
   "main": "index.js",
   "types": "index.d.ts",
   "license": "LGPL-3.0",
