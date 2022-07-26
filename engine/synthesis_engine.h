@@ -39,6 +39,7 @@ public:
         m_core = core;
         m_openjtalk = openjtalk;
     }
+    void update_openjtalk(OpenJTalk *openjtalk) { m_openjtalk = openjtalk; }
 
     Napi::Array create_accent_phrases(Napi::Env env, Napi::String text, Napi::Number speaker_id);
     Napi::Array replace_mora_data(Napi::Array accent_phrases, long speaker_id);

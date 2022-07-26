@@ -72,7 +72,8 @@ EngineWrapper::EngineWrapper(const Napi::CallbackInfo& info)
         m_openjtalk->default_dict_path = default_dict_path;
         m_openjtalk->user_dict_path = user_dict_path;
         m_openjtalk->user_mecab = compiled_dict_path;
-        user_dict_startup_processing(m_openjtalk);
+        m_openjtalk = user_dict_startup_processing(m_openjtalk);
+        m_openjtalk = update_dict(m_openjtalk);
         m_engine = new SynthesisEngine(m_core, m_openjtalk);
     }
     catch (std::exception& err) {
@@ -534,7 +535,7 @@ Napi::Value EngineWrapper::add_user_dict_word(const Napi::CallbackInfo& info) {
     }
     std::string word_uuid;
     try {
-        word_uuid = apply_word(
+        auto result = apply_word(
             m_openjtalk,
             surface,
             pronunciation,
@@ -542,6 +543,9 @@ Napi::Value EngineWrapper::add_user_dict_word(const Napi::CallbackInfo& info) {
             word_type,
             priority
         );
+        word_uuid = result.first;
+        m_openjtalk = result.second;
+        m_engine->update_openjtalk(m_openjtalk);
     } catch (std::exception& err) {
         Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
         return env.Null();
@@ -589,7 +593,7 @@ Napi::Value EngineWrapper::rewrite_user_dict_word(const Napi::CallbackInfo& info
         priority = &priority_value;
     }
     try {
-        rewrite_word(
+        m_openjtalk = rewrite_word(
             m_openjtalk,
             word_uuid,
             surface,
@@ -598,6 +602,7 @@ Napi::Value EngineWrapper::rewrite_user_dict_word(const Napi::CallbackInfo& info
             word_type,
             priority
         );
+        m_engine->update_openjtalk(m_openjtalk);
     } catch (std::exception& err) {
         Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
         return env.Null();
@@ -620,10 +625,11 @@ Napi::Value EngineWrapper::delete_user_dict_word(const Napi::CallbackInfo& info)
 
     std::string word_uuid = info[0].As<Napi::String>().Utf8Value();
     try {
-        delete_word(
+        m_openjtalk = delete_word(
             m_openjtalk,
             word_uuid
         );
+        m_engine->update_openjtalk(m_openjtalk);
     } catch (std::exception& err) {
         Napi::Error::New(info.Env(), err.what()).ThrowAsJavaScriptException();
         return env.Null();

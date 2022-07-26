@@ -11,11 +11,11 @@
 using json = nlohmann::json;
 
 void write_to_json(json user_dict, std::string user_dict_path);
-void user_dict_startup_processing(OpenJTalk *openjtalk);
-void update_dict(OpenJTalk *openjtalk);
+OpenJTalk *user_dict_startup_processing(OpenJTalk *openjtalk);
+OpenJTalk *update_dict(OpenJTalk *openjtalk);
 json read_dict(std::string user_dict_path);
 json create_word(std::string surface, std::string pronunciation, int accent_type, std::string *word_type = nullptr, int *priority = nullptr);
-std::string apply_word(
+std::pair<std::string, OpenJTalk*> apply_word(
     OpenJTalk *openjtalk,
     std::string surface,
     std::string pronunciation,
@@ -23,7 +23,7 @@ std::string apply_word(
     std::string *word_type = nullptr,
     int *priority = nullptr
 );
-void rewrite_word(
+OpenJTalk *rewrite_word(
     OpenJTalk *openjtalk,
     std::string word_uuid,
     std::string surface,
@@ -32,7 +32,7 @@ void rewrite_word(
     std::string *word_type = nullptr,
     int *priority = nullptr
 );
-void delete_word(OpenJTalk *openjtalk, std::string word_uuid);
+OpenJTalk *delete_word(OpenJTalk *openjtalk, std::string word_uuid);
 void import_user_dict(OpenJTalk *openjtalk, json dict_data, bool override);
 
 std::vector<int> search_cost_candidates(int context_id);

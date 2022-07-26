@@ -21,22 +21,24 @@ void write_to_json(json user_dict, std::string user_dict_path) {
     output_file << user_dict_json;
 }
 
-void user_dict_startup_processing(OpenJTalk *openjtalk) {
+OpenJTalk *user_dict_startup_processing(OpenJTalk *openjtalk) {
     std::string default_dict_path = openjtalk->default_dict_path;
     std::string user_dict_path = openjtalk->user_dict_path;
     create_user_dict(openjtalk->dn_mecab, openjtalk->default_dict_path, openjtalk->user_mecab);
+    openjtalk->clear();
     openjtalk = new OpenJTalk(openjtalk->dn_mecab, openjtalk->user_mecab);
     openjtalk->default_dict_path = default_dict_path;
     openjtalk->user_dict_path = user_dict_path;
+    return openjtalk;
 }
 
-void update_dict(OpenJTalk *openjtalk) {
+OpenJTalk *update_dict(OpenJTalk *openjtalk) {
     std::string temp_path = std::tmpnam(nullptr);
     std::ofstream temp_file(temp_path);
     std::ifstream default_dict_file(openjtalk->default_dict_path);
     if (!default_dict_file) {
         std::cout << "Warning: Cannot find default dictionary." << std::endl;
-        return;
+        return openjtalk;
     }
     std::string default_dict((std::istreambuf_iterator<char>(default_dict_file)), std::istreambuf_iterator<char>());
     if (default_dict[default_dict.size() - 1] != '\n') {
@@ -76,13 +78,16 @@ void update_dict(OpenJTalk *openjtalk) {
     std::string default_dict_path = openjtalk->default_dict_path;
     std::string user_dict_path = openjtalk->user_dict_path;
     std::string compiled_dict_path = openjtalk->user_mecab;
+    openjtalk->clear();
     openjtalk = new OpenJTalk(openjtalk->dn_mecab);
     std::ofstream compiled_dict_file(compiled_dict_path, std::ios::out | std::ios::trunc | std::ios::binary);
     compiled_dict_file << temp_dict_file.rdbuf();
     compiled_dict_file.close();
+    openjtalk->clear();
     openjtalk = new OpenJTalk(openjtalk->dn_mecab, compiled_dict_path);
     openjtalk->default_dict_path = default_dict_path;
     openjtalk->user_dict_path = user_dict_path;
+    return openjtalk;
 }
 
 json read_dict(std::string user_dict_path) {
@@ -227,7 +232,7 @@ json create_word(std::string surface, std::string pronunciation, int accent_type
     return result;
 }
 
-std::string apply_word(
+std::pair<std::string, OpenJTalk*> apply_word(
     OpenJTalk *openjtalk,
     std::string surface,
     std::string pronunciation,
@@ -242,11 +247,11 @@ std::string apply_word(
     std::string word_uuid_str = word_uuid.str();
     user_dict[word_uuid_str] = word;
     write_to_json(user_dict, openjtalk->user_dict_path);
-    update_dict(openjtalk);
-    return word_uuid_str;
+    openjtalk = update_dict(openjtalk);
+    return std::make_pair(word_uuid_str, openjtalk);
 }
 
-void rewrite_word(
+OpenJTalk *rewrite_word(
     OpenJTalk *openjtalk,
     std::string word_uuid,
     std::string surface,
@@ -259,10 +264,10 @@ void rewrite_word(
     json user_dict = read_dict(openjtalk->user_dict_path);
     user_dict[word_uuid] = word;
     write_to_json(user_dict, openjtalk->user_dict_path);
-    update_dict(openjtalk);
+    return update_dict(openjtalk);
 }
 
-void delete_word(OpenJTalk *openjtalk, std::string word_uuid) {
+OpenJTalk *delete_word(OpenJTalk *openjtalk, std::string word_uuid) {
     json user_dict = read_dict(openjtalk->user_dict_path);
     bool key_found = false;
     for (auto item : user_dict.items()) {
@@ -274,7 +279,7 @@ void delete_word(OpenJTalk *openjtalk, std::string word_uuid) {
     }
     user_dict.erase(word_uuid);
     write_to_json(user_dict, openjtalk->user_dict_path);
-    update_dict(openjtalk);
+    return update_dict(openjtalk);
 }
 
 // TODO: 実装する
