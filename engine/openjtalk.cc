@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "openjtalk.h"
 
 #include <mecab2njd.h>

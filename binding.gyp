@@ -142,6 +142,7 @@
         "<(module_root_dir)/lib/open_jtalk/src/njd2jpcommon",
         "<(module_root_dir)/lib/open_jtalk/src/text2mecab"
       ],
+      "cflags_cc": [ "-march=native" ],
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
       "defines": [ "NAPI_CPP_EXCEPTIONS" ],
