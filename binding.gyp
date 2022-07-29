@@ -107,8 +107,6 @@
         "core/core.cc",
         "core/core.h",
         "engine/nlohmann/json.hpp",
-        "engine/uuid/endianness.h",
-        "engine/uuid/uuid_v4.h",
         "engine/acoustic_feature_extractor.cc",
         "engine/acoustic_feature_extractor.h",
         "engine/full_context_label.cc",
@@ -123,7 +121,9 @@
         "engine/synthesis_engine.cc",
         "engine/synthesis_engine.h",
         "engine/user_dict.cc",
-        "engine/user_dict.h"
+        "engine/user_dict.h",
+        "engine/uuid_v4.cc",
+        "engine/uuid_v4.h"
       ],
       "dependencies": ["openjtalk"],
       "include_dirs": [
@@ -142,7 +142,6 @@
         "<(module_root_dir)/lib/open_jtalk/src/njd2jpcommon",
         "<(module_root_dir)/lib/open_jtalk/src/text2mecab"
       ],
-      "cflags_cc": [ "-march=native" ],
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
       "defines": [ "NAPI_CPP_EXCEPTIONS" ],

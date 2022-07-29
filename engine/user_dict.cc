@@ -2,7 +2,7 @@
 #include <iostream>
 #include <regex>
 
-#include "uuid/uuid_v4.h"
+#include "uuid_v4.h"
 #include "user_dict.h"
 #include "kana_parser.h"
 #include "part_of_speech_data.h"
@@ -242,13 +242,11 @@ std::pair<std::string, OpenJTalk*> apply_word(
 ) {
     json word = create_word(surface, pronunciation, accent_type, word_type, priority);
     json user_dict = read_dict(openjtalk->user_dict_path);
-    UUIDv4::UUIDGenerator<std::mt19937_64> uuidGenerator;
-    UUIDv4::UUID word_uuid = uuidGenerator.getUUID();
-    std::string word_uuid_str = word_uuid.str();
-    user_dict[word_uuid_str] = word;
+    std::string word_uuid = uuid_v4();
+    user_dict[word_uuid] = word;
     write_to_json(user_dict, openjtalk->user_dict_path);
     openjtalk = update_dict(openjtalk);
-    return std::make_pair(word_uuid_str, openjtalk);
+    return std::make_pair(word_uuid, openjtalk);
 }
 
 OpenJTalk *rewrite_word(
