@@ -159,17 +159,35 @@ json create_word(std::string surface, std::string pronunciation, int accent_type
         surface = std::regex_replace(surface, std::regex(hankaku_str), zenkaku_str);
     }
 
-    // check pronunciation & mora count
-    std::regex all_katakana(R"(^[ァ-ヴー]+$)");
-    if (std::regex_match(pronunciation, all_katakana)) {
-        throw std::runtime_error("invalid pronunciation, pronunciation must be katakana");
+    // check pronunciation
+    size_t char_size;
+    std::string matching_text;
+    for (size_t pos = 0; pos < pronunciation.size(); pos += char_size) {
+        std::string letter = extract_one_character(pronunciation, pos, char_size);
+        matching_text += letter;
+        int counter = 0;
+        while (
+            std::find(mora_list_minimum.begin(), mora_list_minimum.end(), matching_text) == mora_list_minimum.end() &&
+            matching_text != "ー" // 伸ばし棒はmora listには含まれていないため
+        ) {
+            matching_text = letter;
+            counter++;
+            if (counter > 1) {
+                throw std::runtime_error("invalid pronunciation, pronunciation must be katakana");
+            }
+        }
     }
+    // 正規表現を用いたコードは環境によっては正しく動作しない
+    // std::regex all_katakana(R"(^[ァ-ヴー]+$)");
+    // if (std::regex_match(pronunciation, all_katakana)) {
+    //     throw std::runtime_error("invalid pronunciation, pronunciation must be katakana");
+    // }
     std::vector<std::string> sute_gana{"ァ", "ィ", "ゥ", "ェ", "ォ", "ャ", "ュ", "ョ", "ヮ", "ッ"};
     std::vector<std::string> sute_gana_without_sokuon{"ァ", "ィ", "ゥ", "ェ", "ォ", "ャ", "ュ", "ョ", "ヮ"};
     std::vector<std::string> small_wa_before{"ク", "グ"};
 
+    // mora count
     int mora_count = 0;
-    size_t char_size;
     std::string before_letter;
     for (size_t pos = 0; pos < pronunciation.size(); pos += char_size) {
         std::string letter = extract_one_character(pronunciation, pos, char_size);
