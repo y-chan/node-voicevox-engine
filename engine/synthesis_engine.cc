@@ -1,6 +1,5 @@
 #include <iterator>
 #include <sstream>
-#include <iostream>
 
 #include "full_context_label.h"
 #include "mora_list.h"
@@ -335,7 +334,6 @@ Napi::Array SynthesisEngine::synthesis_array(Napi::Env env, Napi::Object query, 
 }
 
 Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::Object query, long speaker_id, bool enable_interrogative_upspeak) {
-    std::cout << "synthesis_wave_format func" << std::endl;
     std::vector<float> wave = synthesis(env, query, speaker_id, enable_interrogative_upspeak);
 
     float volume_scale = query.Get("volumeScale").As<Napi::Number>().FloatValue();
@@ -409,7 +407,6 @@ Napi::Buffer<char> SynthesisEngine::synthesis_wave_format(Napi::Env env, Napi::O
 std::vector<float> SynthesisEngine::synthesis(Napi::Env env, Napi::Object query, int64_t speaker_id, bool enable_interrogative_upspeak) {
     float rate = 200;
 
-    std::cout << "synthesis func" << std::endl;
     Napi::Array accent_phrases = query.Get("accent_phrases").As<Napi::Array>();
     if (enable_interrogative_upspeak) {
         accent_phrases = adjust_interrogative_accent_phrases(env, accent_phrases);
@@ -481,12 +478,10 @@ std::vector<float> SynthesisEngine::synthesis(Napi::Env env, Napi::Object query,
         }
     }
 
-    std::cout << "decode: " << wave_size << std::endl;
     std::vector<float> wave(wave_size, 0.0);
     bool success = m_core->decode_forward((int64_t)phoneme_id_list.size(), (long *)phoneme_id_list.data(), pitches.data(),
                                           durations.data(), (long *)&speaker_id, wave.data());
 
-    std::cout << "decode end" << std::endl;
     if (!success) {
         throw std::runtime_error(m_core->last_error_message());
     }
