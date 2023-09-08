@@ -18,12 +18,12 @@ Napi::Object EngineWrapper::NewInstance(Napi::Env env, const Napi::CallbackInfo&
         return Napi::Object::New(env);
     }
 
-    if (!info[0].IsString() || !info[1].IsString() || !info[2].IsString() || !info[3].IsString() || !info[4].IsBoolean()) {
+    if (!info[0].IsString() || !info[1].IsString() || !info[2].IsString() || !info[3].IsString() || !info[5].IsBoolean()) {
         Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
         return Napi::Object::New(env);
     }
 
-    const std::initializer_list<napi_value> initArgList = { info[0], info[1], info[2], info[3], info[4] };
+    const std::initializer_list<napi_value> initArgList = { info[0], info[1], info[2], info[3], info[4], info[5] };
     Napi::Object obj = env.GetInstanceData<Napi::FunctionReference>()->New(initArgList);
     return scope.Escape(napi_value(obj)).ToObject();
 }
@@ -39,9 +39,8 @@ Napi::Object EngineWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("mora_pitch", &EngineWrapper::mora_pitch),
             InstanceMethod("synthesis", &EngineWrapper::synthesis),
             InstanceMethod("metas", &EngineWrapper::metas),
-            InstanceMethod("yukarin_s_forward", &EngineWrapper::yukarin_s_forward),
-            InstanceMethod("yukarin_sa_forward", &EngineWrapper::yukarin_sa_forward),
-            InstanceMethod("decode_forward", &EngineWrapper::decode_forward),
+            // InstanceMethod("variance_forward", &EngineWrapper::variance_forward),
+            // InstanceMethod("decode_forward", &EngineWrapper::decode_forward),
             InstanceMethod("get_user_dict_words", &EngineWrapper::get_user_dict_words),
             InstanceMethod("add_user_dict_word", &EngineWrapper::add_user_dict_word),
             InstanceMethod("rewrite_user_dict_word", &EngineWrapper::rewrite_user_dict_word),
@@ -63,9 +62,34 @@ EngineWrapper::EngineWrapper(const Napi::CallbackInfo& info)
     std::string default_dict_path = info[1].As<Napi::String>().Utf8Value();
     std::string user_dict_root = info[2].As<Napi::String>().Utf8Value();
     std::string core_file_path = info[3].As<Napi::String>().Utf8Value();
-    bool use_gpu = info[4].As<Napi::Boolean>().Value();
+    std::string root_dir_path;
+    if (info[4].IsString()) {
+        root_dir_path = info[4].As<Napi::String>().Utf8Value();
+    } else {
+        std::vector<std::string> split_path;
+        std::string item;
+        for (char ch: core_file_path) {
+            if (ch == '/' || ch == '\\') {
+                if (!item.empty()) split_path.push_back(item);
+                item.clear();
+            } else {
+                item += ch;
+            }
+        }
+        if (!item.empty()) split_path.push_back(item);
+        // remove file name
+        split_path.pop_back();
+        if (core_file_path[0] == '/') {
+            root_dir_path = "/";
+        }
+        std::for_each(split_path.begin(), split_path.end(), [&](std::string path) {
+            root_dir_path += path + "/";
+        });
+        root_dir_path += "model/";
+    }
+    bool use_gpu = info[5].As<Napi::Boolean>().Value();
     try {
-        m_core = new Core(core_file_path, use_gpu);
+        m_core = new Core(core_file_path, root_dir_path, use_gpu);
         m_openjtalk = new OpenJTalk(openjtalk_dict);
         std::string user_dict_path = user_dict_root + "user_dict.json";
         std::string compiled_dict_path = user_dict_root + "user.dic";
@@ -198,7 +222,10 @@ Napi::Value EngineWrapper::mora_length(const Napi::CallbackInfo& info) {
         return env.Null();
     }
 
-    return m_engine->replace_phoneme_length(info[0].As<Napi::Array>(), info[1].As<Napi::Number>().Int64Value());
+    // 特に使わないが、引数として必要なため
+    std::vector<float> pitches;
+
+    return m_engine->replace_phoneme_length(info[0].As<Napi::Array>(), info[1].As<Napi::Number>().Int64Value(), pitches);
 }
 
 Napi::Value EngineWrapper::mora_pitch(const Napi::CallbackInfo& info) {
@@ -283,185 +310,7 @@ Napi::Value EngineWrapper::metas(const Napi::CallbackInfo& info)
     return metas_string;
 }
 
-Napi::Value EngineWrapper::yukarin_s_forward(const Napi::CallbackInfo& info)
-{
-    Napi::Env env = info.Env();
-    if (info.Length() < 2) {
-        Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-
-    if (!info[0].IsArray() || !info[1].IsNumber()) {
-        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-
-    int length = (int)info[0].As<Napi::Array>().Length();
-
-    std::vector<long> phoneme_list(length);
-    for (int i = 0; i < length; i++) {
-        Napi::Value val = info[0].As<Napi::Array>()[i];
-        phoneme_list[i] = (long)val.As<Napi::Number>().Int64Value();
-    }
-
-    long speaker_id = info[1].As<Napi::Number>().Int64Value();
-
-    std::vector<float> output(length, 0);
-
-    bool success = m_core->yukarin_s_forward(length, phoneme_list.data(), &speaker_id, output.data());
-
-    if (!success) {
-        create_execute_error(env, __func__);
-        return env.Null();
-    }
-
-    Napi::Array output_array = Napi::Array::New(env, length);
-    for (int i = 0; i < length; i++) {
-        output_array[i] = Napi::Number::New(env, output[i]);
-    }
-
-    return output_array;
-}
-
-Napi::Value EngineWrapper::yukarin_sa_forward(const Napi::CallbackInfo& info)
-{
-    Napi::Env env = info.Env();
-    if (info.Length() < 7) {
-        Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-
-    bool wrong_arg = false;
-    for (int i = 0; i < 6; i++) wrong_arg |= !info[i].IsArray();
-    if (wrong_arg || !info[6].IsNumber()) {
-        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-
-    int length = info[0].As<Napi::Array>().Length();
-    std::vector<long> vowel_phoneme_list(length);
-    std::vector<long> consonant_phoneme_list(length);
-    std::vector<long> start_accent_list(length);
-    std::vector<long> end_accent_list(length);
-    std::vector<long> start_accent_phrase_list(length);
-    std::vector<long> end_accent_phrase_list(length);
-
-    for (int i = 0; i < length; i++) {
-        Napi::Value val0 = info[0].As<Napi::Array>()[i];
-        vowel_phoneme_list[i] = val0.As<Napi::Number>().Int32Value();
-
-        Napi::Value val1 = info[1].As<Napi::Array>()[i];
-        consonant_phoneme_list[i] = val1.As<Napi::Number>().Int32Value();
-
-        Napi::Value val2 = info[2].As<Napi::Array>()[i];
-        start_accent_list[i] = val2.As<Napi::Number>().Int32Value();
-
-        Napi::Value val3 = info[3].As<Napi::Array>()[i];
-        end_accent_list[i] = val3.As<Napi::Number>().Int32Value();
-
-        Napi::Value val4 = info[4].As<Napi::Array>()[i];
-        start_accent_phrase_list[i] = val4.As<Napi::Number>().Int32Value();
-
-        Napi::Value val5 = info[5].As<Napi::Array>()[i];
-        end_accent_phrase_list[i] = val5.As<Napi::Number>().Int32Value();
-    }
-
-    long speaker_id = info[6].As<Napi::Number>().Int64Value();
-
-    std::vector<float> output(length, 0);
-
-    if (!m_core->yukarin_sa_forward(
-        length,
-        vowel_phoneme_list.data(),
-        consonant_phoneme_list.data(),
-        start_accent_list.data(),
-        end_accent_list.data(),
-        start_accent_phrase_list.data(),
-        end_accent_phrase_list.data(),
-        &speaker_id,
-        output.data()
-    )) {
-        create_execute_error(env, __func__);
-        return env.Null();
-    }
-
-    Napi::Array output_array = Napi::Array::New(env, length);
-    for (int i = 0; i < length; i++) {
-        output_array[i] = Napi::Number::New(env, output[i]);
-    }
-
-    return output_array;
-}
-
-
-Napi::Value EngineWrapper::decode_forward(const Napi::CallbackInfo& info)
-{
-    Napi::Env env = info.Env();
-    if (info.Length() < 3) {
-        Napi::TypeError::New(env, "missing arguments").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-
-    if (!info[0].IsArray() || !info[1].IsArray() || !info[2].IsNumber()) {
-        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-
-    Napi::Array f0_array = info[0].As<Napi::Array>();
-    Napi::Array phoneme_array = info[1].As<Napi::Array>();
-
-    if (!phoneme_array.IsArray()) {
-        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-
-    Napi::Value phoneme_array_value = phoneme_array[(uint32_t)0];
-    Napi::Array phoneme_array_array = phoneme_array_value.As<Napi::Array>();
-
-    Napi::Value phoneme_value = phoneme_array_array[(uint32_t)0];
-
-    if (!phoneme_value.IsNumber()) {
-        Napi::TypeError::New(env, "wrong arguments").ThrowAsJavaScriptException();
-        return env.Null();
-    }
-
-    int length = info[0].As<Napi::Array>().Length();
-    int phoneme_size = phoneme_array_array.Length();
-
-    std::vector<float> f0(length);
-    std::vector<float> phoneme(length * phoneme_size);
-
-    for (int i = 0; i < length; i++) {
-        Napi::Value val1 = f0_array[i];
-        f0[i] = val1.As<Napi::Number>().FloatValue();
-
-        phoneme_array_value = phoneme_array[i];
-        phoneme_array_array = phoneme_array_value.As<Napi::Array>();
-        for (int j = 0; j < phoneme_size; j++) {
-            Napi::Value val2 = phoneme_array_array[j];
-            phoneme[i * length + j] = val2.As<Napi::Number>().FloatValue();
-        }
-    }
-
-    long speaker_id = info[2].As<Napi::Number>().Int64Value();
-
-    int output_size = length * 256;
-    std::vector<float> output(output_size, 0.0);
-
-    if (!m_core->decode_forward(
-        length, phoneme_size, f0.data(), phoneme.data(), &speaker_id, output.data()
-    )) {
-        create_execute_error(env, __func__);
-        return env.Null();
-    }
-
-    Napi::Array output_array = Napi::Array::New(env, output_size);
-    for (int i = 0; i < output_size; i++) {
-        output_array[i] = Napi::Number::New(env, output[i]);
-    }
-
-    return output_array;
-}
+// TODO: variance_forward, decode_forwardのラッパーの作成
 
 Napi::Value EngineWrapper::get_user_dict_words(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();

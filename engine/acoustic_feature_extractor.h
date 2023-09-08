@@ -78,4 +78,18 @@ public:
     static std::vector<OjtPhoneme> convert(std::vector<OjtPhoneme> phonemes);
 };
 
+class Accent {
+ public:
+  std::string accent;
+
+  static const std::map<std::string, int> accent_map() {
+    std::map<std::string, int> accent_map = {{"[", 0}, {"]", 1}, {"#", 2}, {"?", 3}, {"_", 4}};
+    return accent_map;
+  }
+
+  Accent(std::string c_accent) : accent(c_accent) {}
+
+  long accent_id() const;
+};
+
 #endif // ACOUSTIC_FEATURE_EXTRACTOR_H

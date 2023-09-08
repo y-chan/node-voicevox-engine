@@ -75,21 +75,6 @@ interface IEngine {
     enable_interrogative_upspeak?: boolean
   ): Buffer
   metas(): string
-  yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[]
-  yukarin_sa_forward(
-    vowel_phoneme_list: number[],
-    consonant_phoneme_list: number[],
-    start_accent_list: number[],
-    end_accent_list: number[],
-    start_accent_phrase_list: number[],
-    end_accent_phrase_list: number[],
-    speaker_id: number
-  ): number[]
-  decode_forward(
-    f0: number[],
-    phoneme: number[][],
-    speaker_id: number
-  ): number[]
   get_user_dict_words(): Record<string, UserDictWord>
   add_user_dict_word(
     surface: string,
@@ -124,17 +109,18 @@ class Engine implements IEngine {
    * @param {string} coreFilePath - Coreライブラリのパス(絶対パス推奨)
    * @param {boolean} useGpu - GPUを使うか否か
    */
-  constructor(coreFilePath: string, useGpu: boolean) {
+  constructor(coreFilePath: string, useGpu: boolean, rootDirPath?: string) {
     const user_dict_root = __dirname + '/user_dict/'
     if (!fs.existsSync(user_dict_root)) {
       fs.mkdirSync(user_dict_root)
-  }
+    }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     this.addon = new addon(
       __dirname + '/open_jtalk_dic_utf_8-1.11/',
       __dirname + '/default.csv',
       user_dict_root,
       coreFilePath,
+      rootDirPath,
       useGpu
     )
   }
@@ -230,62 +216,6 @@ class Engine implements IEngine {
    */
   metas(): string {
     return this.addon.metas()
-  }
-
-  /**
-   * 音素列(phoneme_list)から音素ごとの長さを求める関数。
-   * @param {number[]} phoneme_list - 音素列
-   * @param {number[]} speaker_id - 話者番号
-   * @return {number[]} - 音素ごとの長さ
-   */
-  yukarin_s_forward(phoneme_list: number[], speaker_id: number): number[] {
-    return this.addon.yukarin_s_forward(phoneme_list, speaker_id)
-  }
-
-  /**
-   * モーラごとの音素列とアクセント情報から、モーラごとの音高を求める
-   * @param {number[]} vowel_phoneme_list - 母音の音素列
-   * @param {number[]} consonant_phoneme_list - 子音の音素列
-   * @param {number[]} start_accent_list - アクセントの開始位置
-   * @param {number[]} end_accent_list - アクセントの終了位置
-   * @param {number[]} start_accent_phrase_list - アクセント句の開始位置
-   * @param {number[]} end_accent_phrase_list - アクセント句の終了位置
-   * @param {number} speaker_id - 話者番号
-   * @return {number[][]} - モーラごとの音高
-   */
-  yukarin_sa_forward(
-    vowel_phoneme_list: number[],
-    consonant_phoneme_list: number[],
-    start_accent_list: number[],
-    end_accent_list: number[],
-    start_accent_phrase_list: number[],
-    end_accent_phrase_list: number[],
-    speaker_id: number
-  ): number[] {
-    return this.addon.yukarin_sa_forward(
-      vowel_phoneme_list,
-      consonant_phoneme_list,
-      start_accent_list,
-      end_accent_list,
-      start_accent_phrase_list,
-      end_accent_phrase_list,
-      speaker_id
-    )
-  }
-
-  /**
-   * フレームごとの音素と音高から、波形を求める
-   * @param {number[]} f0 - フレームごとの音高
-   * @param {number[][]} phoneme - フレームごとの音素
-   * @param {number} speaker_id - 話者番号
-   * @return {number[]} - 音声波形
-   */
-  decode_forward(
-    f0: number[],
-    phoneme: number[][],
-    speaker_id: number
-  ): number[] {
-    return this.addon.decode_forward(f0, phoneme, speaker_id)
   }
 
   /**

@@ -24,10 +24,6 @@ public:
 
     Napi::Value metas(const Napi::CallbackInfo& info);
 
-    Napi::Value yukarin_s_forward(const Napi::CallbackInfo& info);
-    Napi::Value yukarin_sa_forward(const Napi::CallbackInfo& info);
-    Napi::Value decode_forward(const Napi::CallbackInfo& info);
-
     Napi::Value get_user_dict_words(const Napi::CallbackInfo& info);
     Napi::Value add_user_dict_word(const Napi::CallbackInfo& info);
     Napi::Value rewrite_user_dict_word(const Napi::CallbackInfo& info);

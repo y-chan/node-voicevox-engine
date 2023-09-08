@@ -14,3 +14,5 @@ std::vector<OjtPhoneme> OjtPhoneme::convert(std::vector<OjtPhoneme> phonemes) {
     }
     return phonemes;
 }
+
+long Accent::accent_id() const { return (long)accent_map().at(accent); }

@@ -16,25 +16,21 @@ typedef void* HMODULE;
 typedef void* FARPROC;
 #endif
 
-typedef bool (*INIT)(bool use_gpu, int cpu_num_threads, bool load_all_models);
+typedef bool (*INIT)(char *root_dir_path, bool use_gpu, int cpu_num_threads, bool load_all_models);
 typedef const char *(*RETURN_CHAR)();
-typedef bool (*YUKARIN_S)(int length, long *phoneme_list, long *speaker_id, float *output);
-typedef bool (*YUKARIN_SA)(
+typedef bool (*VARIANCE)(
     int length,
-    long *vowel_phoneme_list,
-    long *consonant_phoneme_list,
-    long *start_accent_list,
-    long *end_accent_list,
-    long *start_accent_phrase_list,
-    long *end_accent_phrase_list,
+    long *phonemes,
+    long *accents,
     long *speaker_id,
-    float *output
+    float *pitch_output,
+    float *duration_output
 );
 typedef bool (*DECODE)(
     int length,
-    int phoneme_size,
-    float *f0,
-    float *phoneme,
+    long *phonemes,
+    float *pitches,
+    float *durations,
     long *speaker_id,
     float *output
 );
@@ -43,30 +39,25 @@ typedef void (*FINAL)();
 
 class Core {
 public:
-    Core(const std::string core_file_path, bool use_gpu);
+    Core(const std::string core_file_path, const std::string root_dir_path, bool use_gpu);
     ~Core();
 
     const char *metas();
 
-    bool yukarin_s_forward(int length, long *phoneme_list, long *speaker_id, float *output);
-
-    bool yukarin_sa_forward(
+    bool variance_forward(
         int length,
-        long *vowel_phoneme_list,
-        long *consonant_phoneme_list,
-        long *start_accent_list,
-        long *end_accent_list,
-        long *start_accent_phrase_list,
-        long *end_accent_phrase_list,
+        long *phonemes,
+        long *accents,
         long *speaker_id,
-        float *output
+        float *pitch_output,
+        float *duration_output
     );
 
     bool decode_forward(
         int length,
-        int phoneme_size,
-        float *f0,
-        float *phoneme,
+        long *phonemes,
+        float *pitches,
+        float *durations,
         long *speaker_id,
         float *output
     );
