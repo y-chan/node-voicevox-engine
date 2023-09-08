@@ -1,6 +1,6 @@
 {
   "name": "node-sharevox-engine",
-  "version": "0.2.2",
+  "version": "0.1.0",
   "main": "index.js",
   "types": "index.d.ts",
   "license": "LGPL-3.0",
@@ -15,7 +15,7 @@
     "start": "ts-node -r tsconfig-paths/register api.ts"
   },
   "keywords": [
-    "VOICEVOX",
+    "SHAREVOX",
     "texttospeech"
   ],
   "author": "y-chan <y-chan@y-chan.dev>",
