@@ -29,7 +29,7 @@ VOICEVOX Coreライブラリをダウンロードし、そのライブラリの�
 ```bash
 # ビルドと依存関係・OpenJTalk辞書のダウンロード
 # npm なら npm install
-yarn inatall
+yarn install
 # 実行する。npm なら npm start
 # onnxruntimeの存在する場所によってパスを適切に変更してください
 # Macの場合はDYDL_LIBRARY_PATH
